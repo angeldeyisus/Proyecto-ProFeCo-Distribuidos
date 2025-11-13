@@ -1,13 +1,30 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 
-const MONGO_URI = process.env.MONGO_URI;
+dotenv.config({ path: './variables.env' });
+
+const config = {
+    url: process.env.MONGO_URI,
+    options: {}
+}
 
 export async function conectar(){
-    try {
-        await mongoose.connect(MONGO_URI);
-        console.log('Conectado a mongoDB (Servicio de Inventario)')
-    } catch (error) {
-        console.error('Error al conectar a MongoDB:', error);
-        process.exit(1);
+    const url = process.env.MONGO_URI;
+
+    if (!url) {
+        throw new Error("FATAL: La variable de entorno MONGO_URI no está definida.");
     }
+    try {
+        await mongoose.connect(url);
+        console.log('🍃 Conectado a MongoDB (Inventario)');
+    } catch (error) {
+        console.error('❌ Error conectando a MongoDB:', error);
+        throw error; // Re-lanzamos para que quien llame sepa que falló
+    }
+    
+}
+
+export async function desconectar(){
+    await mongoose.disconnect();
+    console.log('🍃 Desconectado de MongoDB');
 }

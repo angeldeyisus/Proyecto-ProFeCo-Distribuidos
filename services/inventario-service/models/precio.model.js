@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const precioSchema = new mongoose.Schema({
     producto_id:{
         type: mongoose.Schema.Types.ObjectId,
-        ref: Producto,
+        ref: 'Producto',
         require: true,
     },
     tienda_id: {
