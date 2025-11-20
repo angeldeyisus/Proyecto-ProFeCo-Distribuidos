@@ -91,11 +91,7 @@ export class AuthService {
       if (usuario.password_hash !== password) {
         throw new Error('Credenciales incorrectas');
       }
-
-      if (usuario.estado !== 'ACTIVO') {
-        throw new Error('Tu cuenta está suspendida o inactiva');
-      }
-
+      
       console.log('✅ [AUTH SERVICE] Login exitoso');
 
       const { password_hash, ...usuarioSeguro } = usuario;

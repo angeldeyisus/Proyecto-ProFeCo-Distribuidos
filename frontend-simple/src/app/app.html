@@ -1,122 +1,31 @@
-<div class="container">
-  <!-- HEADER -->
-  <header class="header">
-    <h1>🛒 ProFeCo - Comparador de Precios</h1>
-    <div *ngIf="usuarioLogueado" class="user-info">
-      Bienvenido, {{ usuarioActual?.nombre }}
-      <button (click)="logout()" class="logout-btn">Cerrar Sesión</button>
+<div class="app-container">
+  <header class="app-header">
+    <h1>PROFECO - Protección al Consumidor</h1>
+    
+    <!-- Mostrar información del usuario si está logueado -->
+    <div *ngIf="usuario" class="user-info">
+      <span>Bienvenido, {{ usuario.nombre }}</span>
+      <button (click)="logout()" class="btn-logout">Cerrar Sesión</button>
     </div>
+    
+    <!-- Mostrar navegación si NO está logueado -->
+    <nav *ngIf="!usuario" class="nav-buttons">
+      <button (click)="cambiarVista('home')" [class.active]="vistaActual === 'home'">Inicio</button>
+      <button (click)="cambiarVista('login')" [class.active]="vistaActual === 'login'">Login</button>
+      <button (click)="cambiarVista('register')" [class.active]="vistaActual === 'register'">Registro</button>
+    </nav>
   </header>
 
-  <!-- INDICADOR DE MODO -->
-  <div *ngIf="!serviciosActivos" class="demo-warning">
-    ⚠️ Modo Demo - Los servicios backend no están disponibles
-  </div>
+ <main class="app-main">
+  <app-home *ngIf="vistaActual === 'home' && !usuario"></app-home>
+  <app-login *ngIf="vistaActual === 'login' && !usuario"></app-login>
+  <app-register *ngIf="vistaActual === 'register' && !usuario"></app-register>
+  
+  <!-- ✅ Asegúrate de que esta línea esté así -->
+  <app-dashboard *ngIf="usuario"></app-dashboard>
+</main>
 
-  <!-- AUTENTICACIÓN -->
-  <div *ngIf="!usuarioLogueado" class="auth-container">
-    <!-- PESTAÑAS -->
-    <div class="tabs">
-      <button 
-        [class.active]="modo === 'login'" 
-        (click)="cambiarModo('login')"
-        class="tab-button">
-        🔐 Iniciar Sesión
-      </button>
-      <button 
-        [class.active]="modo === 'registro'" 
-        (click)="cambiarModo('registro')"
-        class="tab-button">
-        📝 Registrarse
-      </button>
-    </div>
-
-    <!-- FORMULARIO LOGIN -->
-    <div *ngIf="modo === 'login'" class="form-section">
-      <h2>Ingresa a tu cuenta</h2>
-      <div class="form-group">
-        <input 
-          type="email" 
-          [(ngModel)]="loginData.email" 
-          placeholder="Email" 
-          class="form-input">
-        <input 
-          type="password" 
-          [(ngModel)]="loginData.password" 
-          placeholder="Contraseña" 
-          class="form-input">
-        <button (click)="login()" class="btn-primary">Entrar a ProFeCo</button>
-      </div>
-      
-      <div class="demo-info">
-        <p><strong>Datos de prueba:</strong></p>
-        <p>Email: test@test.com | Password: 123456</p>
-      </div>
-    </div>
-
-    <!-- FORMULARIO REGISTRO -->
-    <div *ngIf="modo === 'registro'" class="form-section">
-      <h2>Crear nueva cuenta</h2>
-      <div class="form-group">
-        <input 
-          type="text" 
-          [(ngModel)]="registroData.nombre" 
-          placeholder="Nombre completo" 
-          class="form-input">
-        <input 
-          type="email" 
-          [(ngModel)]="registroData.email" 
-          placeholder="Email" 
-          class="form-input">
-        <input 
-          type="password" 
-          [(ngModel)]="registroData.password" 
-          placeholder="Contraseña (mínimo 6 caracteres)" 
-          class="form-input">
-        <select 
-          [(ngModel)]="registroData.tipo_usuario" 
-          class="form-input">
-          <option value="CONSUMIDOR">👤 Consumidor</option>
-          <option value="TIENDA">🏪 Tienda</option>
-          <option value="PROFECO">⚖️ ProFeCo</option>
-        </select>
-        <input 
-          type="tel" 
-          [(ngModel)]="registroData.telefono" 
-          placeholder="Teléfono (opcional)" 
-          class="form-input">
-        <button (click)="registro()" class="btn-primary">Crear Cuenta</button>
-      </div>
-    </div>
-
-    <!-- MENSAJES -->
-    <div *ngIf="mensaje" class="message" [class.error]="esError">
-      {{ mensaje }}
-    </div>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div *ngIf="usuarioLogueado" class="dashboard">
-    <h2>📦 Catálogo de Productos</h2>
-    <p>Explora nuestro catálogo y compara precios</p>
-    
-    <!-- PRODUCTOS -->
-    <div class="products-grid">
-      <div *ngFor="let producto of productos" class="product-card">
-        <div class="product-icon">📦</div>
-        <h3>{{ producto.nombre }}</h3>
-        <p class="product-brand">{{ producto.marca }}</p>
-        <p class="product-desc">{{ producto.descripcion }}</p>
-        <div class="product-details">
-          <span class="product-size">{{ producto.contenido }} {{ producto.unidad_medida }}</span>
-          <span *ngIf="producto.precio" class="product-price">${{ producto.precio }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div *ngIf="productos.length === 0" class="no-products">
-      <p>No hay productos disponibles</p>
-      <button (click)="cargarProductos()" class="btn-secondary">Cargar Productos</button>
-    </div>
-  </div>
+  <footer class="app-footer">
+    <p>&copy; 2024 PROFECO. Todos los derechos reservados.</p>
+  </footer>
 </div>
