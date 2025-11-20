@@ -1,55 +1,86 @@
-import * as authRepository from '../auth.repository.js'
+import { AuthRepository } from '../repositories/auth.repository.js';
 
 export class AuthService {
-    /**
-     * Regla de Negocio: Registrar un usuario
-     * Valida que no exista uno duplicado
-     */
-    async registrarUsuario(datos){
-        //1. Validacion de correo
-        const usuarioExistente = await authRepository.encontrarUsuarioPorEmail(datos.email);
-        if(usuarioExistente){
-            throw new Error(`El correo ${datos.email} ya esta registrado en el sistema.`);
-        }
+  constructor() {
+    this.authRepository = new AuthRepository();
+  }
 
-        //2. Validacion de contraseña
-        if(datos.password.length < 6){
-            throw new Error("La contraseña debe tener almenos 6 caracteres.");
-        }
+  async registrarUsuario(datosUsuario) {
+    try {
+      const usuarioExistente = await this.authRepository.encontrarUsuarioPorEmail(datosUsuario.email);
+      if (usuarioExistente) {
+        throw new Error(`El email ${datosUsuario.email} ya está registrado`);
+      }
 
-        //3. Llamar a la Capa de Datos
-        //NOTA para Chris y Angel del presente: Hashear la contraseña cuando la capa de seguridad esté creada
-        const nuevoUsuario = await authRepository.crearUsuario(
-            datos.email,
-            datos.password,
-            datos.nombre,
-            datos.tipo_usuario
-        );
+      if (datosUsuario.password.length < 6) {
+        throw new Error('La contraseña debe tener al menos 6 caracteres');
+      }
 
-        return nuevoUsuario;
+      const tiposValidos = ['CONSUMIDOR', 'TIENDA', 'PROFECO'];
+      if (!tiposValidos.includes(datosUsuario.tipo_usuario)) {
+        throw new Error('Tipo de usuario no válido');
+      }
+
+      const nuevoUsuario = await this.authRepository.crearUsuario({
+        email: datosUsuario.email,
+        password_hash: datosUsuario.password, 
+        nombre: datosUsuario.nombre,
+        tipo_usuario: datosUsuario.tipo_usuario,
+        telefono: datosUsuario.telefono
+      });
+
+      const { password_hash, ...usuarioSeguro } = nuevoUsuario;
+      return {
+        mensaje: 'Usuario registrado exitosamente',
+        usuario: usuarioSeguro
+      };
+
+    } catch (error) {
+      console.error('Error en AuthService.registrarUsuario:', error);
+      throw error;
     }
+  }
 
-    /**
-     * Regla de negocio: Login
-     * Verifica credenciales
-     */
-    async login(email, password){
-        const usuario = await authRepository.encontrarUsuarioPorEmail(email);
-        if(!usuario){
-            throw new Error("Usuario no encontrado");
-        }
+  async login(email, password) {
+    try {
+      const usuario = await this.authRepository.encontrarUsuarioPorEmail(email);
+      if (!usuario) {
+        throw new Error('Credenciales incorrectas');
+      }
 
-        if(usuario.password_hash != password){
-            throw new Error("Coontraseña incorrecta.");
-        }
+      if (usuario.password_hash !== password) {
+        throw new Error('Credenciales incorrectas');
+      }
 
-        return {
-            mensaje: "Acceso Concedido",
-            usuario: {
-                id: usuario.usuario_id,
-                nombre: usuario.nombre,
-                rol: usuario.tipo_usuario
-            }
-        };
+      if (usuario.estado !== 'ACTIVO') {
+        throw new Error('Tu cuenta está suspendida o inactiva');
+      }
+
+      const { password_hash, ...usuarioSeguro } = usuario;
+      return {
+        mensaje: 'Login exitoso',
+        usuario: usuarioSeguro
+      };
+
+    } catch (error) {
+      console.error('Error en AuthService.login:', error);
+      throw error;
     }
+  }
+
+  async obtenerPerfil(usuarioId) {
+    try {
+      const usuario = await this.authRepository.encontrarUsuarioPorId(usuarioId);
+      if (!usuario) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      const { password_hash, ...usuarioSeguro } = usuario;
+      return usuarioSeguro;
+
+    } catch (error) {
+      console.error('Error en AuthService.obtenerPerfil:', error);
+      throw error;
+    }
+  }
 }

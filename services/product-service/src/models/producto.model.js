@@ -15,8 +15,7 @@ const productoSchema = new mongoose.Schema({
         trim: true
     },
     categoria_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Categoria",
+        type: String,
         required: true
     },
     upc: {
@@ -32,7 +31,7 @@ const productoSchema = new mongoose.Schema({
         required: true
     },
     contenido: {
-        type: Number, // 1, 2, 5, etc.
+        type: Number,
         required: true
     },
     estado: {
@@ -42,7 +41,7 @@ const productoSchema = new mongoose.Schema({
     },
     atributos: {
         perecedero: { type: Boolean, default: false },
-        organic: { type: Boolean, default: false },
+        organico: { type: Boolean, default: false },
         gluten_free: { type: Boolean, default: false },
         lactosa_free: { type: Boolean, default: false }
     }

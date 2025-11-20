@@ -2,13 +2,11 @@ import mongoose from "mongoose";
 
 const calificacionSchema = new mongoose.Schema({
   usuario_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Usuario",
+    type: String,
     required: true
   },
   tienda_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Tienda",
+    type: String,
     required: true
   },
   puntuacion: {

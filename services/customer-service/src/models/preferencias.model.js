@@ -2,17 +2,14 @@ import mongoose from "mongoose";
 
 const preferenciasSchema = new mongoose.Schema({
   usuario_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Usuario",
+    type: String,
     required: true
   },
   supermercados_favoritos: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Tienda"
+    type: String,
   }],
   productos_frecuentes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Producto"
+    type: String, 
   }],
   categorias_interes: [{
     type: String

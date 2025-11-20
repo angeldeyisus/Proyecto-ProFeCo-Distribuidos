@@ -2,18 +2,15 @@ import mongoose from "mongoose";
 
 const inconsistenciaSchema = new mongoose.Schema({
     reporte_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Reporte",
+        type: String,
         required: true
     },
     tienda_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tienda",
+        type: String,
         required: true
     },
     producto_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Producto",
+        type: String,
         required: true
     },
     precio_publicado: {

@@ -2,13 +2,11 @@ import mongoose from "mongoose";
 
 const precioSchema = new mongoose.Schema({
     producto_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Producto",
+        type: String,
         required: true
     },
     tienda_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Tienda",
+        type: String,
         required: true
     },
     precio: {

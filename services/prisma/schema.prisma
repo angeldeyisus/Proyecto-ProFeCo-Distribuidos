@@ -4,7 +4,8 @@
 // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
-// schema.prisma
+// /prisma/schema.prisma
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,427 +15,66 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Usuario {
+  usuario_id    String      @id @default(uuid())
+  email         String      @unique
+  password_hash String
+  nombre        String
+  tipo_usuario  TipoUsuario
+
+  // Relaciones
+  tienda Tienda? // Un usuario PUEDE ser dueño de una tienda
+  multas Multa[] // Un usuario ProFeCo puede poner multas (si quisiéramos)
+
+  @@map("usuarios")
+}
+
+model Tienda {
+  tienda_id   String   @id @default(uuid())
+  usuario_id  String   @unique // El ID del usuario dueño
+  nombre      String
+  direccion   String?
+  latitud     Decimal?
+  longitud    Decimal?
+  logo_url    String?
+
+  // Relación con el usuario
+  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+
+  // Relación con las multas
+  multas Multa[]
+
+  @@map("tiendas")
+}
+
+model Multa {
+  multa_id      String      @id @default(uuid())
+  tienda_id     String // FK a Tienda
+  fecha_emision DateTime    @default(now())
+  motivo        String
+  monto         Decimal
+  estado        EstadoMulta @default(PENDIENTE)
+
+  // Relación con la tienda
+  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])
+
+  // Opcional: Quién la puso (un usuario ProFeCo)
+  usuario_id String? // FK a Usuario (puede ser nulo)
+  usuario    Usuario? @relation(fields: [usuario_id], references: [usuario_id])
+
+  @@map("multas")
+}
+
+// ---------- ENUMS ----------
+
 enum TipoUsuario {
   CONSUMIDOR
   TIENDA
   PROFECO
 }
 
-enum EstadoUsuario {
-  ACTIVO
-  INACTIVO
-  SUSPENDIDO
-}
-
-enum TipoTienda {
-  SUPERMERCADO
-  MERCADO_POPULAR
-  MERCADO_SOBRE_RUEDAS
-}
-
-enum EstadoProducto {
-  ACTIVO
-  INACTIVO
-  DESCONTINUADO
-}
-
-enum EstadoOferta {
-  ACTIVA
-  EXPIRADA
-  CANCELADA
-  AGOTADA
-}
-
-enum TipoReporte {
-  INCONSISTENCIA_PRECIO
-  PRODUCTO_NO_DISPONIBLE
-  PUBLICIDAD_ENGAÑOSA
-  OTROS
-}
-
-enum EstadoReporte {
-  PENDIENTE
-  EN_REVISION
-  RESUELTO
-  RECHAZADO
-}
-
-enum EstadoInconsistencia {
-  REPORTADA
-  EN_INVESTIGACION
-  CONFIRMADA
-  RECHAZADA
-  RESUELTA
-}
-
-enum TipoMulta {
-  LEVE
-  GRAVE
-  MUY_GRAVE
-}
-
 enum EstadoMulta {
   PENDIENTE
   PAGADA
-  EN_APELACION
-  VENCIDA
-}
-
-enum CanalNotificacion {
-  PUSH
-  EMAIL
-  SMS
-}
-
-enum EstadoNotificacion {
-  PENDIENTE
-  ENVIADA
-  FALLIDA
-}
-
-model Usuario {
-  usuario_id      String      @id @default(cuid())
-  email           String      @unique
-  password_hash   String
-  nombre          String
-  tipo_usuario    TipoUsuario
-  telefono        String?
-  avatar_url      String?
-  estado          EstadoUsuario @default(ACTIVO)
-  latitud         Float?
-  longitud        Float?
-  direccion       String?
-  created_at      DateTime    @default(now())
-  updated_at      DateTime    @updatedAt
-
-  // Relaciones
-  tienda          Tienda?
-  calificaciones  Calificacion[]
-  reportes        Reporte[]
-  multas          Multa[]
-  preferencias    Preferencias?
-  wishlists       Wishlist[]
-  listas_compra   ListaCompra[]
-  notificaciones  Notificacion[]
-
-  @@map("usuarios")
-}
-
-model Tienda {
-  tienda_id             String    @id @default(cuid())
-  usuario_id            String    @unique
-  nombre                String
-  tipo_tienda           TipoTienda
-  direccion_calle       String
-  direccion_ciudad      String
-  direccion_estado      String
-  direccion_codigo_postal String?
-  latitud               Float
-  longitud              Float
-  telefono              String?
-  horario_apertura      String?
-  horario_cierre        String?
-  dias_apertura         String[]
-  calificacion_promedio Float?   @default(0)
-  total_calificaciones  Int?     @default(0)
-  logo_url              String?
-  estado                EstadoUsuario @default(ACTIVO)
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-
-  // Relaciones
-  usuario               Usuario   @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  precios               Precio[]
-  ofertas               Oferta[]
-  calificaciones        Calificacion[]
-  reportes              Reporte[]
-  inconsistencias       Inconsistencia[]
-  multas                Multa[]
-  supermercados_favoritos Preferencias[] @relation("SupermercadosFavoritos")
-
-  @@index([latitud, longitud])
-  @@map("tiendas")
-}
-
-model Categoria {
-  categoria_id  String   @id @default(cuid())
-  nombre        String
-  descripcion   String?
-  icono         String?
-  imagen_url    String?
-  padre_id      String?
-  nivel         Int      @default(1)
-  orden         Int      @default(0)
-  estado        EstadoUsuario @default(ACTIVO)
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
-
-  // Relaciones
-  padre         Categoria? @relation("CategoriaHierarchy", fields: [padre_id], references: [categoria_id], onDelete: NoAction)
-  hijos         Categoria[] @relation("CategoriaHierarchy")
-  productos     Producto[]
-  categorias_interes Preferencias[] @relation("CategoriasInteres")
-
-  @@map("categorias")
-}
-
-model Producto {
-  producto_id    String    @id @default(cuid())
-  nombre         String
-  descripcion    String?
-  marca          String?
-  categoria_id   String
-  upc            String?   @unique
-  imagen_url     String?
-  unidad_medida  String
-  contenido      Float
-  estado         EstadoProducto @default(ACTIVO)
-  perecedero     Boolean   @default(false)
-  organico       Boolean   @default(false)
-  gluten_free    Boolean   @default(false)
-  lactosa_free   Boolean   @default(false)
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
-
-  // Relaciones
-  categoria      Categoria @relation(fields: [categoria_id], references: [categoria_id], onDelete: Restrict)
-  precios        Precio[]
-  ofertas        Oferta[]
-  reportes       Reporte[]
-  inconsistencias Inconsistencia[]
-  productos_frecuentes Preferencias[] @relation("ProductosFrecuentes")
-  wishlist_items Wishlist[] @relation("WishlistProductos")
-  lista_compra_items ListaCompra[] @relation("ListaCompraItems")
-
-  @@index([nombre, descripcion])
-  @@map("productos")
-}
-
-model Precio {
-  precio_id              String   @id @default(cuid())
-  producto_id            String
-  tienda_id              String
-  precio                 Float
-  precio_promocional     Float?
-  disponible             Boolean  @default(true)
-  ultima_actualizacion   DateTime @default(now())
-  fuente                 String   @default("tienda")
-  created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
-
-  // Relaciones
-  producto               Producto @relation(fields: [producto_id], references: [producto_id], onDelete: Restrict)
-  tienda                 Tienda   @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-
-  @@unique([producto_id, tienda_id])
-  @@index([precio])
-  @@index([ultima_actualizacion])
-  @@map("precios")
-}
-
-model Oferta {
-  oferta_id                String      @id @default(cuid())
-  tienda_id                String
-  producto_id              String
-  precio_oferta            Float
-  precio_regular           Float
-  descuento_porcentaje     Float?
-  descripcion              String?
-  fecha_inicio             DateTime
-  fecha_fin                DateTime
-  stock_oferta             Int?
-  estado                   EstadoOferta @default(ACTIVA)
-  notificaciones_enviadas  Boolean     @default(false)
-  created_at               DateTime    @default(now())
-  updated_at               DateTime    @updatedAt
-
-  // Relaciones
-  tienda                   Tienda      @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-  producto                 Producto    @relation(fields: [producto_id], references: [producto_id], onDelete: Restrict)
-
-  @@index([fecha_fin, estado])
-  @@map("ofertas")
-}
-
-model Calificacion {
-  calificacion_id        String   @id @default(cuid())
-  usuario_id             String
-  tienda_id              String
-  puntuacion             Int      // 1-5
-  comentario             String?
-  titulo                 String?
-  precios_puntuacion     Int?
-  limpieza_puntuacion    Int?
-  atencion_puntuacion    Int?
-  variedad_puntuacion    Int?
-  recomendada            Boolean?
-  estado                 EstadoUsuario @default(ACTIVO)
-  created_at             DateTime @default(now())
-  updated_at             DateTime @updatedAt
-
-  // Relaciones
-  usuario                Usuario  @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  tienda                 Tienda   @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-
-  @@unique([usuario_id, tienda_id])
-  @@index([tienda_id, puntuacion])
-  @@map("calificaciones")
-}
-
-model Reporte {
-  reporte_id          String        @id @default(cuid())
-  usuario_id          String
-  tienda_id           String
-  producto_id         String
-  tipo                TipoReporte
-  descripcion         String
-  evidencia_url       String?
-  estado              EstadoReporte @default(PENDIENTE)
-  fecha_resolucion    DateTime?
-  respuesta_profeco   String?
-  created_at          DateTime      @default(now())
-  updated_at          DateTime      @updatedAt
-
-  // Relaciones
-  usuario             Usuario       @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  tienda              Tienda        @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-  producto            Producto      @relation(fields: [producto_id], references: [producto_id], onDelete: Restrict)
-  inconsistencia      Inconsistencia?
-
-  @@index([usuario_id])
-  @@index([tienda_id])
-  @@index([estado])
-  @@index([created_at])
-  @@map("reportes")
-}
-
-model Inconsistencia {
-  inconsistencia_id       String              @id @default(cuid())
-  reporte_id              String              @unique
-  tienda_id               String
-  producto_id             String
-  precio_publicado        Float
-  precio_real             Float
-  diferencia              Float
-  porcentaje_diferencia   Float
-  evidencia_url           String?
-  estado                  EstadoInconsistencia @default(REPORTADA)
-  fecha_reporte           DateTime            @default(now())
-  fecha_resolucion        DateTime?
-  comentario_investigacion String?
-  created_at              DateTime            @default(now())
-  updated_at              DateTime            @updatedAt
-
-  // Relaciones
-  reporte                 Reporte             @relation(fields: [reporte_id], references: [reporte_id], onDelete: Restrict)
-  tienda                  Tienda              @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-  producto                Producto            @relation(fields: [producto_id], references: [producto_id], onDelete: Restrict)
-  multa                   Multa[]
-
-  @@index([tienda_id, estado])
-  @@index([porcentaje_diferencia])
-  @@map("inconsistencias")
-}
-
-model Multa {
-  multa_id            String        @id @default(cuid())
-  tienda_id           String
-  inconsistencia_id   String?
-  motivo              String
-  monto               Float
-  tipo_multa          TipoMulta
-  fecha_emision       DateTime      @default(now())
-  fecha_limite_pago   DateTime
-  estado              EstadoMulta   @default(PENDIENTE)
-  descripcion         String?
-  recurrencia         Int           @default(1)
-  created_at          DateTime      @default(now())
-  updated_at          DateTime      @updatedAt
-
-  // Relaciones
-  tienda              Tienda        @relation(fields: [tienda_id], references: [tienda_id], onDelete: Restrict)
-  inconsistencia      Inconsistencia? @relation(fields: [inconsistencia_id], references: [inconsistencia_id], onDelete: SetNull)
-  usuario             Usuario?      @relation(fields: [usuario_id], references: [usuario_id], onDelete: SetNull)
-  usuario_id          String?
-
-  @@index([tienda_id])
-  @@index([estado])
-  @@index([fecha_limite_pago])
-  @@map("multas")
-}
-
-model Preferencias {
-  preferencia_id          String    @id @default(cuid())
-  usuario_id              String    @unique
-  notificaciones_ofertas  Boolean   @default(true)
-  radio_busqueda          Int       @default(10)
-  created_at              DateTime  @default(now())
-  updated_at              DateTime  @updatedAt
-
-  // Relaciones
-  usuario                 Usuario   @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  
-  // Relaciones many-to-many
-  supermercados_favoritos Tienda[]    @relation("SupermercadosFavoritos")
-  productos_frecuentes    Producto[]  @relation("ProductosFrecuentes")
-  categorias_interes      Categoria[] @relation("CategoriasInteres")
-
-  @@map("preferencias")
-}
-
-model Wishlist {
-  wishlist_id     String    @id @default(cuid())
-  usuario_id      String
-  nombre          String    @default("Mi lista de deseos")
-  es_publica      Boolean   @default(false)
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
-
-  // Relaciones
-  usuario         Usuario   @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  productos       Producto[] @relation("WishlistProductos")
-
-  @@index([usuario_id])
-  @@map("wishlists")
-}
-
-model ListaCompra {
-  lista_compra_id       String    @id @default(cuid())
-  usuario_id            String
-  nombre                String
-  presupuesto_total     Float?
-  fecha_estimada_compra DateTime?
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
-
-  // Relaciones
-  usuario               Usuario   @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-  productos             Producto[] @relation("ListaCompraItems")
-
-  @@index([usuario_id])
-  @@map("lista_compras")
-}
-
-model Notificacion {
-  notificacion_id String              @id @default(cuid())
-  usuario_id      String
-  tipo            String
-  titulo          String
-  mensaje         String
-  datos           Json?
-  leida           Boolean             @default(false)
-  fecha_envio     DateTime            @default(now())
-  fecha_leida     DateTime?
-  canal           CanalNotificacion   @default(PUSH)
-  estado_envio    EstadoNotificacion  @default(PENDIENTE)
-  created_at      DateTime            @default(now())
-  updated_at      DateTime            @updatedAt
-
-  // Relaciones
-  usuario         Usuario             @relation(fields: [usuario_id], references: [usuario_id], onDelete: Restrict)
-
-  @@index([usuario_id, leida])
-  @@index([tipo])
-  @@index([fecha_envio])
-  @@map("notificaciones")
+  APELADA
 }

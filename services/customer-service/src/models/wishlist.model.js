@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const wishlistSchema = new mongoose.Schema({
   usuario_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Usuario",
+    type: String,
     required: true
   },
   nombre: {
@@ -12,8 +11,7 @@ const wishlistSchema = new mongoose.Schema({
   },
   productos: [{
     producto_id: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Producto",
+      type: String,
       required: true
     },
     fecha_agregado: {

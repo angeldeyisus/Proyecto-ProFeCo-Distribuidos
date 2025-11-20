@@ -2,15 +2,14 @@ import mongoose from "mongoose";
 
 const notificacionSchema = new mongoose.Schema({
     usuario_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Usuario",
+        type: String,
         required: true
     },
     tipo: {
         type: String,
         enum: [
             'oferta',
-            'inconsistencia_resuelta',
+            'inconsistencia_resuelta', 
             'nuevo_producto',
             'multa_publicada',
             'precio_bajo',
@@ -31,7 +30,7 @@ const notificacionSchema = new mongoose.Schema({
     },
     datos: {
         type: mongoose.Schema.Types.Mixed
-    }, // { productoId, tiendaId, ofertaId, etc. }
+    },
     leida: {
         type: Boolean,
         default: false

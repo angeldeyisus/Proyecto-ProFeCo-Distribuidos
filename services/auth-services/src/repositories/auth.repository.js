@@ -1,38 +1,58 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function crearUsuario(email, passwordHash, nombre, tipo){
+export class AuthRepository {
+
+  async encontrarUsuarioPorEmail(email) {
     try {
-        const nuevoUsuario = await prisma.usuario.create({
-            data: {
-                email: email,
-                password_hash: passwordHash,
-                nombre: nombre,
-                tipo_usuario: tipo,
-            },
-        });
-
-        return nuevoUsuario;
-
+      return await prisma.usuario.findUnique({
+        where: { email }
+      });
     } catch (error) {
-        console.error("Error al crear al usuario: " + error);
-        throw new Error("Error en la base de datos al crear al usuario");
+      throw new Error(`Error buscando usuario por email: ${error.message}`);
     }
-}
+  }
 
-export async function encontrarUsuarioPorEmail(email) {
+  async encontrarUsuarioPorId(usuarioId) {
     try {
-        const usuario = await prisma.usuario.findUnique({
-            where: {
-                email: email,
-            },
-        });
-
-        return usuario;
-        
+      return await prisma.usuario.findUnique({
+        where: { usuario_id: usuarioId }
+      });
     } catch (error) {
-        console.error("Error al buscar usuario:", error);
-        throw new Error("Error en la base de datos al buscar usuario.");
+      throw new Error(`Error buscando usuario por ID: ${error.message}`);
     }
+  }
+
+  async crearUsuario(usuarioData) {
+    try {
+      return await prisma.usuario.create({
+        data: {
+          email: usuarioData.email,
+          password_hash: usuarioData.password_hash, // Sin hash por ahora
+          nombre: usuarioData.nombre,
+          tipo_usuario: usuarioData.tipo_usuario,
+          telefono: usuarioData.telefono || null,
+          estado: 'ACTIVO'
+        }
+      });
+    } catch (error) {
+      throw new Error(`Error creando usuario: ${error.message}`);
+    }
+  }
+
+  async actualizarUsuario(usuarioId, datosActualizados) {
+    try {
+      return await prisma.usuario.update({
+        where: { usuario_id: usuarioId },
+        data: datosActualizados
+      });
+    } catch (error) {
+      throw new Error(`Error actualizando usuario: ${error.message}`);
+    }
+  }
+
+  async desconectar() {
+    await prisma.$disconnect();
+  }
 }

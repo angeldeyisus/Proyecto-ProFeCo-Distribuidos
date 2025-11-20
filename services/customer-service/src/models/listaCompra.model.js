@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 
 const listaCompraSchema = new mongoose.Schema({
     usuario_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Usuario",
+        type: String,
         required: true
     },
     nombre: {
@@ -13,8 +12,7 @@ const listaCompraSchema = new mongoose.Schema({
     },
     items: [{
         producto_id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Producto",
+            type: String,
             required: true
         },
         cantidad: {
