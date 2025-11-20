@@ -1,4 +1,4 @@
-import Precio from "./models/precio.model.js";
+import Precio from "../../models/precio.model.js";
 
 export async function actualizarPrecio(tiendaId, productoId, precioNormal, precioOferta) {
     try {
