@@ -4,12 +4,10 @@ const authService = new AuthService();
 
 export class AuthController {
 
-  // Registrar usuario
   async registrar(req, res) {
     try {
       const { email, password, nombre, tipo_usuario, telefono } = req.body;
 
-      // Validaciones básicas
       if (!email || !password || !nombre || !tipo_usuario) {
         return res.status(400).json({
           error: 'Faltan campos obligatorios: email, password, nombre, tipo_usuario'
@@ -32,7 +30,6 @@ export class AuthController {
     }
   }
 
-  // Iniciar sesión
   async login(req, res) {
     try {
       const { email, password } = req.body;
@@ -52,7 +49,6 @@ export class AuthController {
     }
   }
 
-  // Obtener perfil (sin auth por ahora)
   async obtenerPerfil(req, res) {
     try {
       const { usuarioId } = req.params;
