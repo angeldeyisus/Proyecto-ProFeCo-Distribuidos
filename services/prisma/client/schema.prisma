@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  usuario_id    String      @id @default(uuid())
+  email         String      @unique
+  password_hash String
+  nombre        String
+  tipo_usuario  TipoUsuario
+
+  // Relaciones
+  tienda Tienda? // Un usuario PUEDE ser dueño de una tienda
+  multas Multa[] // Un usuario ProFeCo puede poner multas (si quisiéramos)
+
+  @@map("usuarios")
+}
+
+model Tienda {
+  tienda_id  String   @id @default(uuid())
+  usuario_id String   @unique // El ID del usuario dueño
+  nombre     String
+  direccion  String?
+  latitud    Decimal?
+  longitud   Decimal?
+  logo_url   String?
+
+  // Relación con el usuario
+  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+
+  // Relación con las multas
+  multas Multa[]
+
+  @@map("tiendas")
+}
+
+model Multa {
+  multa_id      String      @id @default(uuid())
+  tienda_id     String // FK a Tienda
+  fecha_emision DateTime    @default(now())
+  motivo        String
+  monto         Decimal
+  estado        EstadoMulta @default(PENDIENTE)
+
+  // Relación con la tienda
+  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])
+
+  // Opcional: Quién la puso (un usuario ProFeCo)
+  usuario_id String? // FK a Usuario (puede ser nulo)
+  usuario    Usuario? @relation(fields: [usuario_id], references: [usuario_id])
+
+  @@map("multas")
+}
+
+enum TipoUsuario {
+  CONSUMIDOR
+  TIENDA
+  PROFECO
+}
+
+enum EstadoMulta {
+  PENDIENTE
+  PAGADA
+  APELADA
+}
