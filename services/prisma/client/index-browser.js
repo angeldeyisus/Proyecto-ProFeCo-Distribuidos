@@ -126,7 +126,35 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   email: 'email',
   password_hash: 'password_hash',
   nombre: 'nombre',
-  tipo_usuario: 'tipo_usuario'
+  tipo_usuario: 'tipo_usuario',
+  is_verified: 'is_verified',
+  is_active: 'is_active',
+  last_login: 'last_login',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.PerfilUsuarioScalarFieldEnum = {
+  perfil_id: 'perfil_id',
+  usuario_id: 'usuario_id',
+  telefono: 'telefono',
+  direccion: 'direccion',
+  fecha_nacimiento: 'fecha_nacimiento',
+  avatar_url: 'avatar_url',
+  preferencias: 'preferencias',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.SesionUsuarioScalarFieldEnum = {
+  sesion_id: 'sesion_id',
+  usuario_id: 'usuario_id',
+  token: 'token',
+  expires_at: 'expires_at',
+  is_active: 'is_active',
+  user_agent: 'user_agent',
+  ip_address: 'ip_address',
+  created_at: 'created_at'
 };
 
 exports.Prisma.TiendaScalarFieldEnum = {
@@ -136,22 +164,49 @@ exports.Prisma.TiendaScalarFieldEnum = {
   direccion: 'direccion',
   latitud: 'latitud',
   longitud: 'longitud',
-  logo_url: 'logo_url'
+  logo_url: 'logo_url',
+  is_activa: 'is_activa',
+  horario: 'horario',
+  telefono: 'telefono',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.MultaScalarFieldEnum = {
   multa_id: 'multa_id',
   tienda_id: 'tienda_id',
+  usuario_id: 'usuario_id',
   fecha_emision: 'fecha_emision',
   motivo: 'motivo',
   monto: 'monto',
   estado: 'estado',
-  usuario_id: 'usuario_id'
+  fecha_pago: 'fecha_pago',
+  evidencia_url: 'evidencia_url',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.PrecioScalarFieldEnum = {
+  precio_id: 'precio_id',
+  producto_id: 'producto_id',
+  tienda_id: 'tienda_id',
+  precio: 'precio',
+  en_oferta: 'en_oferta',
+  precio_original: 'precio_original',
+  disponible: 'disponible',
+  ultima_actualizacion: 'ultima_actualizacion',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -163,22 +218,33 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.TipoUsuario = exports.$Enums.TipoUsuario = {
   CONSUMIDOR: 'CONSUMIDOR',
   TIENDA: 'TIENDA',
-  PROFECO: 'PROFECO'
+  PROFECO: 'PROFECO',
+  SUPER_ADMIN: 'SUPER_ADMIN'
 };
 
 exports.EstadoMulta = exports.$Enums.EstadoMulta = {
   PENDIENTE: 'PENDIENTE',
   PAGADA: 'PAGADA',
-  APELADA: 'APELADA'
+  APELADA: 'APELADA',
+  CANCELADA: 'CANCELADA'
 };
 
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',
+  PerfilUsuario: 'PerfilUsuario',
+  SesionUsuario: 'SesionUsuario',
   Tienda: 'Tienda',
-  Multa: 'Multa'
+  Multa: 'Multa',
+  Precio: 'Precio'
 };
 
 /**

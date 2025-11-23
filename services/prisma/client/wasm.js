@@ -98,7 +98,35 @@ exports.Prisma.UsuarioScalarFieldEnum = {
   email: 'email',
   password_hash: 'password_hash',
   nombre: 'nombre',
-  tipo_usuario: 'tipo_usuario'
+  tipo_usuario: 'tipo_usuario',
+  is_verified: 'is_verified',
+  is_active: 'is_active',
+  last_login: 'last_login',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.PerfilUsuarioScalarFieldEnum = {
+  perfil_id: 'perfil_id',
+  usuario_id: 'usuario_id',
+  telefono: 'telefono',
+  direccion: 'direccion',
+  fecha_nacimiento: 'fecha_nacimiento',
+  avatar_url: 'avatar_url',
+  preferencias: 'preferencias',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.SesionUsuarioScalarFieldEnum = {
+  sesion_id: 'sesion_id',
+  usuario_id: 'usuario_id',
+  token: 'token',
+  expires_at: 'expires_at',
+  is_active: 'is_active',
+  user_agent: 'user_agent',
+  ip_address: 'ip_address',
+  created_at: 'created_at'
 };
 
 exports.Prisma.TiendaScalarFieldEnum = {
@@ -108,22 +136,49 @@ exports.Prisma.TiendaScalarFieldEnum = {
   direccion: 'direccion',
   latitud: 'latitud',
   longitud: 'longitud',
-  logo_url: 'logo_url'
+  logo_url: 'logo_url',
+  is_activa: 'is_activa',
+  horario: 'horario',
+  telefono: 'telefono',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.MultaScalarFieldEnum = {
   multa_id: 'multa_id',
   tienda_id: 'tienda_id',
+  usuario_id: 'usuario_id',
   fecha_emision: 'fecha_emision',
   motivo: 'motivo',
   monto: 'monto',
   estado: 'estado',
-  usuario_id: 'usuario_id'
+  fecha_pago: 'fecha_pago',
+  evidencia_url: 'evidencia_url',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+};
+
+exports.Prisma.PrecioScalarFieldEnum = {
+  precio_id: 'precio_id',
+  producto_id: 'producto_id',
+  tienda_id: 'tienda_id',
+  precio: 'precio',
+  en_oferta: 'en_oferta',
+  precio_original: 'precio_original',
+  disponible: 'disponible',
+  ultima_actualizacion: 'ultima_actualizacion',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
 };
 
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -135,22 +190,33 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.TipoUsuario = exports.$Enums.TipoUsuario = {
   CONSUMIDOR: 'CONSUMIDOR',
   TIENDA: 'TIENDA',
-  PROFECO: 'PROFECO'
+  PROFECO: 'PROFECO',
+  SUPER_ADMIN: 'SUPER_ADMIN'
 };
 
 exports.EstadoMulta = exports.$Enums.EstadoMulta = {
   PENDIENTE: 'PENDIENTE',
   PAGADA: 'PAGADA',
-  APELADA: 'APELADA'
+  APELADA: 'APELADA',
+  CANCELADA: 'CANCELADA'
 };
 
 exports.Prisma.ModelName = {
   Usuario: 'Usuario',
+  PerfilUsuario: 'PerfilUsuario',
+  SesionUsuario: 'SesionUsuario',
   Tienda: 'Tienda',
-  Multa: 'Multa'
+  Multa: 'Multa',
+  Precio: 'Precio'
 };
 /**
  * Create the Client
@@ -200,13 +266,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Usuario {\n  usuario_id    String      @id @default(uuid())\n  email         String      @unique\n  password_hash String\n  nombre        String\n  tipo_usuario  TipoUsuario\n\n  // Relaciones\n  tienda Tienda? // Un usuario PUEDE ser dueño de una tienda\n  multas Multa[] // Un usuario ProFeCo puede poner multas (si quisiéramos)\n\n  @@map(\"usuarios\")\n}\n\nmodel Tienda {\n  tienda_id  String   @id @default(uuid())\n  usuario_id String   @unique // El ID del usuario dueño\n  nombre     String\n  direccion  String?\n  latitud    Decimal?\n  longitud   Decimal?\n  logo_url   String?\n\n  // Relación con el usuario\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])\n\n  // Relación con las multas\n  multas Multa[]\n\n  @@map(\"tiendas\")\n}\n\nmodel Multa {\n  multa_id      String      @id @default(uuid())\n  tienda_id     String // FK a Tienda\n  fecha_emision DateTime    @default(now())\n  motivo        String\n  monto         Decimal\n  estado        EstadoMulta @default(PENDIENTE)\n\n  // Relación con la tienda\n  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])\n\n  // Opcional: Quién la puso (un usuario ProFeCo)\n  usuario_id String? // FK a Usuario (puede ser nulo)\n  usuario    Usuario? @relation(fields: [usuario_id], references: [usuario_id])\n\n  @@map(\"multas\")\n}\n\nenum TipoUsuario {\n  CONSUMIDOR\n  TIENDA\n  PROFECO\n}\n\nenum EstadoMulta {\n  PENDIENTE\n  PAGADA\n  APELADA\n}\n",
-  "inlineSchemaHash": "edadc950833141e028f0a8e110c7c6d8973bd3c80f67777d5001cea224ced5e6",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"./client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Usuario {\n  usuario_id    String      @id @default(uuid())\n  email         String      @unique\n  password_hash String\n  nombre        String\n  tipo_usuario  TipoUsuario\n  is_verified   Boolean     @default(false)\n  is_active     Boolean     @default(true)\n  last_login    DateTime?\n  created_at    DateTime    @default(now())\n  updated_at    DateTime    @updatedAt\n\n  // Relaciones\n  tienda   Tienda?\n  multas   Multa[]\n  perfil   PerfilUsuario?\n  sesiones SesionUsuario[]\n\n  @@map(\"usuarios\")\n}\n\nmodel PerfilUsuario {\n  perfil_id        String    @id @default(uuid())\n  usuario_id       String    @unique\n  telefono         String?\n  direccion        String?\n  fecha_nacimiento DateTime?\n  avatar_url       String?\n  preferencias     Json? // { notificaciones: boolean, tema: string, etc }\n\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)\n\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  @@map(\"perfiles_usuario\")\n}\n\nmodel SesionUsuario {\n  sesion_id  String   @id @default(uuid())\n  usuario_id String\n  token      String   @unique\n  expires_at DateTime\n  is_active  Boolean  @default(true)\n  user_agent String?\n  ip_address String?\n\n  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)\n\n  created_at DateTime @default(now())\n\n  @@map(\"sesiones_usuario\")\n}\n\nmodel Tienda {\n  tienda_id  String   @id @default(uuid())\n  usuario_id String   @unique\n  nombre     String\n  direccion  String?\n  latitud    Decimal?\n  longitud   Decimal?\n  logo_url   String?\n  is_activa  Boolean  @default(true)\n  horario    String? // \"L-V: 9:00-18:00, S: 9:00-14:00\"\n  telefono   String?\n\n  // Relaciones\n  usuario Usuario  @relation(fields: [usuario_id], references: [usuario_id])\n  multas  Multa[]\n  precios Precio[] // Nueva relación con precios\n\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  @@map(\"tiendas\")\n}\n\nmodel Multa {\n  multa_id      String      @id @default(uuid())\n  tienda_id     String\n  usuario_id    String? // Usuario Profeco que aplicó la multa\n  fecha_emision DateTime    @default(now())\n  motivo        String\n  monto         Decimal\n  estado        EstadoMulta @default(PENDIENTE)\n  fecha_pago    DateTime?\n  evidencia_url String? // URL de imagen/comprobante\n\n  // Relaciones\n  tienda  Tienda   @relation(fields: [tienda_id], references: [tienda_id])\n  usuario Usuario? @relation(fields: [usuario_id], references: [usuario_id])\n\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  @@map(\"multas\")\n}\n\n// NUEVO: Modelo para integrar con Product-Service\nmodel Precio {\n  precio_id            String   @id @default(uuid())\n  producto_id          String // ID del producto en MongoDB\n  tienda_id            String\n  precio               Decimal\n  en_oferta            Boolean  @default(false)\n  precio_original      Decimal?\n  disponible           Boolean  @default(true)\n  ultima_actualizacion DateTime @default(now())\n\n  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])\n\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n\n  @@index([producto_id, tienda_id])\n  @@map(\"precios\")\n}\n\nenum TipoUsuario {\n  CONSUMIDOR\n  TIENDA\n  PROFECO\n  SUPER_ADMIN\n}\n\nenum EstadoMulta {\n  PENDIENTE\n  PAGADA\n  APELADA\n  CANCELADA\n}\n",
+  "inlineSchemaHash": "971204fea91a4b72b30e67543dcc0d08e0fd6cb69b9da4955bc357d4aaf4316f",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"Usuario\":{\"fields\":[{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tipo_usuario\",\"kind\":\"enum\",\"type\":\"TipoUsuario\"},{\"name\":\"tienda\",\"kind\":\"object\",\"type\":\"Tienda\",\"relationName\":\"TiendaToUsuario\"},{\"name\":\"multas\",\"kind\":\"object\",\"type\":\"Multa\",\"relationName\":\"MultaToUsuario\"}],\"dbName\":\"usuarios\"},\"Tienda\":{\"fields\":[{\"name\":\"tienda_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"direccion\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"latitud\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"longitud\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"logo_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"TiendaToUsuario\"},{\"name\":\"multas\",\"kind\":\"object\",\"type\":\"Multa\",\"relationName\":\"MultaToTienda\"}],\"dbName\":\"tiendas\"},\"Multa\":{\"fields\":[{\"name\":\"multa_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tienda_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fecha_emision\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"motivo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"monto\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"estado\",\"kind\":\"enum\",\"type\":\"EstadoMulta\"},{\"name\":\"tienda\",\"kind\":\"object\",\"type\":\"Tienda\",\"relationName\":\"MultaToTienda\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"MultaToUsuario\"}],\"dbName\":\"multas\"}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"Usuario\":{\"fields\":[{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password_hash\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tipo_usuario\",\"kind\":\"enum\",\"type\":\"TipoUsuario\"},{\"name\":\"is_verified\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"is_active\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"last_login\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"tienda\",\"kind\":\"object\",\"type\":\"Tienda\",\"relationName\":\"TiendaToUsuario\"},{\"name\":\"multas\",\"kind\":\"object\",\"type\":\"Multa\",\"relationName\":\"MultaToUsuario\"},{\"name\":\"perfil\",\"kind\":\"object\",\"type\":\"PerfilUsuario\",\"relationName\":\"PerfilUsuarioToUsuario\"},{\"name\":\"sesiones\",\"kind\":\"object\",\"type\":\"SesionUsuario\",\"relationName\":\"SesionUsuarioToUsuario\"}],\"dbName\":\"usuarios\"},\"PerfilUsuario\":{\"fields\":[{\"name\":\"perfil_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"telefono\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"direccion\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fecha_nacimiento\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"avatar_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"preferencias\",\"kind\":\"scalar\",\"type\":\"Json\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"PerfilUsuarioToUsuario\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"perfiles_usuario\"},\"SesionUsuario\":{\"fields\":[{\"name\":\"sesion_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"token\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"expires_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"is_active\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"user_agent\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"ip_address\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"SesionUsuarioToUsuario\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"sesiones_usuario\"},\"Tienda\":{\"fields\":[{\"name\":\"tienda_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"nombre\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"direccion\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"latitud\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"longitud\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"logo_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"is_activa\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"horario\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"telefono\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"TiendaToUsuario\"},{\"name\":\"multas\",\"kind\":\"object\",\"type\":\"Multa\",\"relationName\":\"MultaToTienda\"},{\"name\":\"precios\",\"kind\":\"object\",\"type\":\"Precio\",\"relationName\":\"PrecioToTienda\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"tiendas\"},\"Multa\":{\"fields\":[{\"name\":\"multa_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tienda_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"usuario_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"fecha_emision\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"motivo\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"monto\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"estado\",\"kind\":\"enum\",\"type\":\"EstadoMulta\"},{\"name\":\"fecha_pago\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"evidencia_url\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tienda\",\"kind\":\"object\",\"type\":\"Tienda\",\"relationName\":\"MultaToTienda\"},{\"name\":\"usuario\",\"kind\":\"object\",\"type\":\"Usuario\",\"relationName\":\"MultaToUsuario\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"multas\"},\"Precio\":{\"fields\":[{\"name\":\"precio_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"producto_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"tienda_id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"precio\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"en_oferta\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"precio_original\",\"kind\":\"scalar\",\"type\":\"Decimal\"},{\"name\":\"disponible\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"ultima_actualizacion\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"tienda\",\"kind\":\"object\",\"type\":\"Tienda\",\"relationName\":\"PrecioToTienda\"},{\"name\":\"created_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updated_at\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":\"precios\"}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),

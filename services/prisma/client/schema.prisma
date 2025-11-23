@@ -14,58 +14,128 @@ model Usuario {
   password_hash String
   nombre        String
   tipo_usuario  TipoUsuario
+  is_verified   Boolean     @default(false)
+  is_active     Boolean     @default(true)
+  last_login    DateTime?
+  created_at    DateTime    @default(now())
+  updated_at    DateTime    @updatedAt
 
   // Relaciones
-  tienda Tienda? // Un usuario PUEDE ser dueño de una tienda
-  multas Multa[] // Un usuario ProFeCo puede poner multas (si quisiéramos)
+  tienda   Tienda?
+  multas   Multa[]
+  perfil   PerfilUsuario?
+  sesiones SesionUsuario[]
 
   @@map("usuarios")
 }
 
+model PerfilUsuario {
+  perfil_id        String    @id @default(uuid())
+  usuario_id       String    @unique
+  telefono         String?
+  direccion        String?
+  fecha_nacimiento DateTime?
+  avatar_url       String?
+  preferencias     Json? // { notificaciones: boolean, tema: string, etc }
+
+  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@map("perfiles_usuario")
+}
+
+model SesionUsuario {
+  sesion_id  String   @id @default(uuid())
+  usuario_id String
+  token      String   @unique
+  expires_at DateTime
+  is_active  Boolean  @default(true)
+  user_agent String?
+  ip_address String?
+
+  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id], onDelete: Cascade)
+
+  created_at DateTime @default(now())
+
+  @@map("sesiones_usuario")
+}
+
 model Tienda {
   tienda_id  String   @id @default(uuid())
-  usuario_id String   @unique // El ID del usuario dueño
+  usuario_id String   @unique
   nombre     String
   direccion  String?
   latitud    Decimal?
   longitud   Decimal?
   logo_url   String?
+  is_activa  Boolean  @default(true)
+  horario    String? // "L-V: 9:00-18:00, S: 9:00-14:00"
+  telefono   String?
 
-  // Relación con el usuario
-  usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
+  // Relaciones
+  usuario Usuario  @relation(fields: [usuario_id], references: [usuario_id])
+  multas  Multa[]
+  precios Precio[] // Nueva relación con precios
 
-  // Relación con las multas
-  multas Multa[]
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("tiendas")
 }
 
 model Multa {
   multa_id      String      @id @default(uuid())
-  tienda_id     String // FK a Tienda
+  tienda_id     String
+  usuario_id    String? // Usuario Profeco que aplicó la multa
   fecha_emision DateTime    @default(now())
   motivo        String
   monto         Decimal
   estado        EstadoMulta @default(PENDIENTE)
+  fecha_pago    DateTime?
+  evidencia_url String? // URL de imagen/comprobante
 
-  // Relación con la tienda
-  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])
+  // Relaciones
+  tienda  Tienda   @relation(fields: [tienda_id], references: [tienda_id])
+  usuario Usuario? @relation(fields: [usuario_id], references: [usuario_id])
 
-  // Opcional: Quién la puso (un usuario ProFeCo)
-  usuario_id String? // FK a Usuario (puede ser nulo)
-  usuario    Usuario? @relation(fields: [usuario_id], references: [usuario_id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("multas")
+}
+
+// NUEVO: Modelo para integrar con Product-Service
+model Precio {
+  precio_id            String   @id @default(uuid())
+  producto_id          String // ID del producto en MongoDB
+  tienda_id            String
+  precio               Decimal
+  en_oferta            Boolean  @default(false)
+  precio_original      Decimal?
+  disponible           Boolean  @default(true)
+  ultima_actualizacion DateTime @default(now())
+
+  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([producto_id, tienda_id])
+  @@map("precios")
 }
 
 enum TipoUsuario {
   CONSUMIDOR
   TIENDA
   PROFECO
+  SUPER_ADMIN
 }
 
 enum EstadoMulta {
   PENDIENTE
   PAGADA
   APELADA
+  CANCELADA
 }

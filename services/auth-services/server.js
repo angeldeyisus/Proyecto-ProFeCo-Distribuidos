@@ -1,63 +1,192 @@
+// services/auth-services/server.js
 import express from 'express';
 import cors from 'cors';
-import { AuthController } from './src/controllers/auth.controller.js';
+import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import { generateToken } from './src/utils/jwt.js'; // ✅ Usar JWT real
+import { PrismaClient } from '../prisma/client/default.js';
 
+const prisma = new PrismaClient();
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
-const authController = new AuthController();
 
 app.use(cors());
 app.use(express.json());
 
-app.use((req, res, next) => {
-  console.log(`📍 [${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
+// Health Check (igual)
+app.get('/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ 
+      success: true,
+      status: 'OK ✅', 
+      service: 'Auth Service',
+      database: 'PostgreSQL Connected',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error de conexión a BD:', error);
+    res.status(500).json({
+      success: false,
+      status: 'ERROR ❌',
+      service: 'Auth Service', 
+      database: 'Disconnected',
+      error: error.message
+    });
+  }
 });
 
-app.post('/api/auth/register', (req, res) => authController.registrar(req, res));
-app.post('/api/auth/login', (req, res) => authController.login(req, res));
-app.get('/api/auth/profile/:usuarioId', (req, res) => authController.obtenerPerfil(req, res));
+// REGISTRO MEJORADO con bcrypt
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, nombre, tipo_usuario = 'CONSUMIDOR' } = req.body;
 
-app.get('/api/auth/debug/usuarios', (req, res) => authController.listarUsuarios(req, res));
-app.get('/api/auth/health/db', (req, res) => authController.healthCheck(req, res));
-
-app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    service: 'auth-service',
-    database: 'PostgreSQL',
-    timestamp: new Date().toISOString()
-  });
-});
-
-app.get('/', (req, res) => {
-  res.json({
-    mensaje: '🚀 Auth Service - ProFeCo (PostgreSQL)',
-    endpoints: {
-      registrar: 'POST /api/auth/register',
-      login: 'POST /api/auth/login',
-      perfil: 'GET /api/auth/profile/:id',
-      health: 'GET /health',
-      debug: 'GET /api/auth/debug/usuarios'
+    if (!email || !password || !nombre) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, password y nombre son requeridos'
+      });
     }
-  });
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 6 caracteres'
+      });
+    }
+
+    const existingUser = await prisma.usuario.findUnique({
+      where: { email }
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        message: 'El usuario ya existe'
+      });
+    }
+
+    // ✅ BCRYPT REAL
+    const password_hash = await bcrypt.hash(password, 12);
+
+    const usuario = await prisma.usuario.create({
+      data: {
+        email,
+        password_hash, // ✅ Hash real
+        nombre,
+        tipo_usuario
+      },
+      select: {
+        usuario_id: true,
+        email: true,
+        nombre: true,
+        tipo_usuario: true,
+        created_at: true
+      }
+    });
+
+    // ✅ JWT REAL
+    const token = generateToken({
+      usuario_id: usuario.usuario_id,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      tipo_usuario: usuario.tipo_usuario
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Usuario registrado exitosamente',
+      data: { 
+        usuario,
+        token // ✅ Token real
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en registro:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error en el registro: ' + error.message
+    });
+  }
 });
 
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint no encontrado' });
+// LOGIN MEJORADO con bcrypt y JWT real
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y password son requeridos'
+      });
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { 
+        email,
+        is_active: true 
+      }
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    // ✅ BCRYPT REAL para comparar
+    const isValidPassword = await bcrypt.compare(password, usuario.password_hash);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({
+        success: false,
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    // Actualizar last_login
+    await prisma.usuario.update({
+      where: { usuario_id: usuario.usuario_id },
+      data: { last_login: new Date() }
+    });
+
+    // ✅ JWT REAL
+    const token = generateToken({
+      usuario_id: usuario.usuario_id,
+      email: usuario.email,
+      nombre: usuario.nombre,
+      tipo_usuario: usuario.tipo_usuario
+    });
+
+    res.json({
+      success: true,
+      message: 'Login exitoso',
+      data: {
+        usuario: {
+          usuario_id: usuario.usuario_id,
+          email: usuario.email,
+          nombre: usuario.nombre,
+          tipo_usuario: usuario.tipo_usuario,
+          is_verified: usuario.is_verified
+        },
+        token // ✅ Token real
+      }
+    });
+
+  } catch (error) {
+    console.error('Error en login:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error en el login: ' + error.message
+    });
+  }
 });
 
 app.listen(PORT, () => {
-  console.log('🚀 ==========================================');
-  console.log('🚀 Auth Service - PostgreSQL');
-  console.log('🚀 Puerto:', PORT);
-  console.log('🚀 Base de datos: PostgreSQL');
-  console.log('🚀 ==========================================');
-  console.log('📝 Endpoints:');
-  console.log('   POST http://localhost:' + PORT + '/api/auth/register');
-  console.log('   POST http://localhost:' + PORT + '/api/auth/login');
-  console.log('   GET  http://localhost:' + PORT + '/api/auth/profile/:id');
-  console.log('   GET  http://localhost:' + PORT + '/health');
-  console.log('   GET  http://localhost:' + PORT + '/api/auth/debug/usuarios');
-  console.log('🚀 ==========================================');
+  console.log(`🔐 Auth Service MEJORADO en puerto ${PORT}`);
+  console.log(`✅ JWT y BCRYPT implementados correctamente`);
 });
