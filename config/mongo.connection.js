@@ -4,12 +4,12 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './variables.env' });
 
 const config = {
-    url: process.env.MONGO_URI,
+    url: process.env.MONGODB_URI,
     options: {}
 }
 
 export async function conectar(){
-    const url = process.env.MONGO_URI;
+    const url = process.env.MONGODB_URI;
 
     if (!url) {
         throw new Error("FATAL: La variable de entorno MONGO_URI no está definida.");

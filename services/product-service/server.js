@@ -1,55 +1,52 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import cors from 'cors';
-import { connectMongoDB } from './src/config/database.js';
-import { ProductController } from './src/controllers/product.controller.js';
+import dotenv from 'dotenv';
 
+// Routes - RUTAS CORREGIDAS CON NOMBRES REALES
+import productRoutes from './src/routes/productRoutes.js';
+import priceRoutes from './src/routes/priceRoutes.js';
+
+// Configuración
+dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3002;
-const productController = new ProductController();
 
+// Middlewares
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-connectMongoDB();
+// Conexión a MongoDB
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/profeco-products';
 
-app.get('/api/products', (req, res) => productController.obtenerProductos(req, res));
-app.get('/api/products/search', (req, res) => productController.buscarProductos(req, res));
-app.get('/api/products/:id', (req, res) => productController.obtenerProducto(req, res));
-app.post('/api/products', (req, res) => productController.crearProducto(req, res));
-app.get('/api/products/category/:categoriaId', (req, res) => productController.obtenerPorCategoria(req, res));
+mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(() => {
+    console.log('✅ Conectado a MongoDB - Product Service');
+})
+.catch((error) => {
+    console.error('❌ Error conectando a MongoDB:', error);
+    process.exit(1);
+});
 
+// Routes
+app.use('/api/products', productRoutes);
+app.use('/api/prices', priceRoutes);
+
+// Health Check
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
-    service: 'product-service',
-    timestamp: new Date().toISOString(),
-    database: 'MongoDB'
-  });
-});
-
-app.get('/', (req, res) => {
-  res.json({
-    mensaje: '🚀 Product Service - ProFeCo',
-    endpoints: {
-      obtenerProductos: 'GET /api/products',
-      buscarProductos: 'GET /api/products/search?q=texto',
-      obtenerProducto: 'GET /api/products/:id',
-      crearProducto: 'POST /api/products',
-      productosPorCategoria: 'GET /api/products/category/:categoriaId'
-    }
-  });
-});
-
-app.use('*', (req, res) => {
-  res.status(404).json({ error: 'Endpoint no encontrado' });
+    res.json({ 
+        status: 'OK', 
+        service: 'Product Service',
+        timestamp: new Date().toISOString()
+    });
 });
 
 app.listen(PORT, () => {
-  console.log(`🛍️ Product Service running on port ${PORT}`);
-  console.log(`📝 Endpoints disponibles:`);
-  console.log(`   GET  http://localhost:${PORT}/api/products`);
-  console.log(`   GET  http://localhost:${PORT}/api/products/search?q=leche`);
-  console.log(`   GET  http://localhost:${PORT}/api/products/:id`);
-  console.log(`   POST http://localhost:${PORT}/api/products`);
-  console.log(`   GET  http://localhost:${PORT}/health`);
+    console.log(`🎯 Product Service en puerto ${PORT}`);
 });
+
+export default app;

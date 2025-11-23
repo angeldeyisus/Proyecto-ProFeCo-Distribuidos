@@ -18,8 +18,17 @@ const productoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    categoria_nombre: {
+        type: String,
+        trim: true
+    },
     upc: {
         type: String, // Código de barras
+        unique: true,
+        sparse: true
+    },
+    sku: {
+        type: String,
         unique: true,
         sparse: true
     },
@@ -44,6 +53,15 @@ const productoSchema = new mongoose.Schema({
         organico: { type: Boolean, default: false },
         gluten_free: { type: Boolean, default: false },
         lactosa_free: { type: Boolean, default: false }
+    },
+    tags: [{
+        type: String,
+        trim: true
+    }],
+    metadata: {
+        tipo: String,
+        peso_unitario: Number,
+        volumen: Number
     }
 }, {
     timestamps: true
@@ -53,5 +71,9 @@ productoSchema.index({ nombre: "text", descripcion: "text" });
 productoSchema.index({ categoria_id: 1 });
 productoSchema.index({ marca: 1 });
 productoSchema.index({ upc: 1 });
+productoSchema.index({ sku: 1 });
+productoSchema.index({ estado: 1 });
+productoSchema.index({ "atributos.organico": 1 });
+productoSchema.index({ tags: 1 });
 
 export default mongoose.model("Producto", productoSchema);
