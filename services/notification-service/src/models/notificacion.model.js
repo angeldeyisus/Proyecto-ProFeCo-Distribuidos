@@ -1,63 +1,52 @@
 import mongoose from "mongoose";
 
-const notificacionSchema = new mongoose.Schema({
+const notificationSchema = new mongoose.Schema({
+    tipo: {
+        type: String,
+        required: true,
+        enum: ['email', 'push', 'sms', 'in_app']
+    },
+    categoria: {
+        type: String,
+        required: true,
+        enum: ['oferta_producto', 'precio_bajado', 'nuevo_producto', 'alerta_wishlist', 'general']
+    },
     usuario_id: {
         type: String,
         required: true
     },
-    tipo: {
-        type: String,
-        enum: [
-            'oferta',
-            'inconsistencia_resuelta', 
-            'nuevo_producto',
-            'multa_publicada',
-            'precio_bajo',
-            'producto_favorito_en_oferta',
-            'recordatorio_lista'
-        ],
-        required: true
-    },
     titulo: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     mensaje: {
         type: String,
-        required: true,
-        trim: true
+        required: true
     },
     datos: {
-        type: mongoose.Schema.Types.Mixed
+        type: mongoose.Schema.Types.Mixed 
     },
-    leida: {
-        type: Boolean,
-        default: false
+    estado: {
+        type: String,
+        enum: ['pendiente', 'enviada', 'fallida', 'leida'],
+        default: 'pendiente'
     },
-    fecha_envio: {
+    intentos: {
+        type: Number,
+        default: 0
+    },
+    programada_para: {
         type: Date,
         default: Date.now
     },
-    fecha_leida: {
-        type: Date
-    },
-    canal: {
-        type: String,
-        enum: ['push', 'email', 'sms'],
-        default: 'push'
-    },
-    estado_envio: {
-        type: String,
-        enum: ['pendiente', 'enviada', 'fallida'],
-        default: 'pendiente'
-    }
+    enviada_en: Date,
+    error: String
 }, {
     timestamps: true
 });
 
-notificacionSchema.index({ usuario_id: 1, leida: 1 });
-notificacionSchema.index({ tipo: 1 });
-notificacionSchema.index({ fecha_envio: 1 });
+notificationSchema.index({ usuario_id: 1, estado: 1 });
+notificationSchema.index({ categoria: 1 });
+notificationSchema.index({ programada_para: 1 });
 
-export default mongoose.model("Notificacion", notificacionSchema);
+export default mongoose.model("Notification", notificationSchema);

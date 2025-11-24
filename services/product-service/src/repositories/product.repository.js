@@ -1,4 +1,3 @@
-// services/product-service/src/repositories/productRepository.js
 import Producto from '../models/producto.model.js';
 
 class ProductRepository {
