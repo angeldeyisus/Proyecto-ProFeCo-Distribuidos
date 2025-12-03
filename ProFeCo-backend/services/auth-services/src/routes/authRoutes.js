@@ -1,13 +1,13 @@
 // services/auth-service/src/routes/authRoutes.js
 import express from 'express';
-import AuthController from '../controllers/auth.controller.js';
+import { AuthController } from '../controllers/auth.controller.js';
 import { authenticateToken, requireRole } from '../middleware/auth.js';
 
 const router = express.Router();
 const authController = new AuthController();
 
 // RUTAS PÚBLICAS
-router.post('/register', authController.register.bind(authController));
+router.post('/register', authController.registrar.bind(authController));
 router.post('/login', authController.login.bind(authController));
 
 // RUTAS PROTEGIDAS

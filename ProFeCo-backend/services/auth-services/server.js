@@ -4,7 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
 import { generateToken } from './src/utils/jwt.js'; // ✅ Usar JWT real
-import { PrismaClient } from '../prisma/client/default.js';
+import { PrismaClient } from '../../prisma/client/default.js';
 
 const prisma = new PrismaClient();
 dotenv.config();
