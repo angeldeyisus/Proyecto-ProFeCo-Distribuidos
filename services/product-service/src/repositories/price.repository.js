@@ -2,18 +2,54 @@ import Precio from '../models/precio.model.js';
 
 class PriceRepository {
 
+    async crearPrecio(precioData) {
+        try {
+            const precio = new Precio(precioData);
+            return await precio.save();
+        } catch (error) {
+            if (error.code === 11000) {
+                throw new Error('Ya existe un precio para este producto en esta tienda');
+            }
+            throw new Error(`Error al crear precio: ${error.message}`);
+        }
+    }
+
+    async crearMultiplesPrecios(preciosData) {
+        try {
+            return await Precio.insertMany(preciosData, { ordered: false });
+        } catch (error) {
+            throw new Error(`Error al crear múltiples precios: ${error.message}`);
+        }
+    }
+
+    async contarPrecios() {
+        try {
+            return await Precio.countDocuments();
+        } catch (error) {
+            throw new Error(`Error al contar precios: ${error.message}`);
+        }
+    }
+
+    async limpiarPrecios() {
+        try {
+            return await Precio.deleteMany({});
+        } catch (error) {
+            throw new Error(`Error al limpiar precios: ${error.message}`);
+        }
+    }
+
     async crearOActualizarPrecio(precioData) {
         const { producto_id, tienda_id } = precioData;
 
         if (precioData.en_oferta && precioData.valor_descuento) {
             if (precioData.tipo_descuento === 'porcentaje') {
                 precioData.precio_promocional = precioData.precio_original * (1 - precioData.valor_descuento / 100);
-            } else { 
+            } else {
                 precioData.precio_promocional = precioData.precio_original - precioData.valor_descuento;
             }
             precioData.precio = Math.max(0, precioData.precio_promocional);
         }
-        
+
         return await Precio.findOneAndUpdate(
             { producto_id, tienda_id },
             precioData,
@@ -28,7 +64,7 @@ class PriceRepository {
     async obtenerPreciosPorProducto(producto_id, soloDisponibles = true) {
         const criterios = { producto_id };
         if (soloDisponibles) criterios.disponible = true;
-        
+
         return await Precio.find(criterios)
             .sort({ precio: 1 });
     }
@@ -36,7 +72,7 @@ class PriceRepository {
     async obtenerPreciosPorTienda(tienda_id, paginacion = {}) {
         const { pagina = 1, limite = 50 } = paginacion;
         const skip = (pagina - 1) * limite;
-        
+
         return await Precio.find({ tienda_id, disponible: true })
             .skip(skip)
             .limit(limite)
@@ -62,7 +98,7 @@ class PriceRepository {
             'vigencia_oferta.fin': { $gte: ahora },
             'vigencia_oferta.inicio': { $lte: ahora },
             disponible: true
-        }).sort({ precio: 1 }); 
+        }).sort({ precio: 1 });
     }
 
     async obtenerMejoresPrecios(producto_id, limite = 10) {
@@ -70,15 +106,15 @@ class PriceRepository {
             producto_id,
             disponible: true
         })
-        .sort({ precio: 1 })
-        .limit(limite);
+            .sort({ precio: 1 })
+            .limit(limite);
     }
 
     async buscarOfertasPorFecha(inicio, fin) {
         return await Precio.find({
             en_oferta: true,
             $or: [
-                { 
+                {
                     'vigencia_oferta.inicio': { $lte: fin },
                     'vigencia_oferta.fin': { $gte: inicio }
                 }
@@ -139,7 +175,7 @@ class PriceRepository {
                 }
             }
         ]);
-        
+
         return resultados[0] || {
             precioMinimo: 0,
             precioMaximo: 0,

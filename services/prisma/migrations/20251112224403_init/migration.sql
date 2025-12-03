@@ -55,8 +55,6 @@ CREATE TABLE "tiendas" (
     "usuario_id" TEXT NOT NULL,
     "nombre" TEXT NOT NULL,
     "direccion" TEXT,
-    "latitud" DECIMAL(65,30),
-    "longitud" DECIMAL(65,30),
     "logo_url" TEXT,
     "is_activa" BOOLEAN NOT NULL DEFAULT true,
     "horario" TEXT,
@@ -84,22 +82,6 @@ CREATE TABLE "multas" (
     CONSTRAINT "multas_pkey" PRIMARY KEY ("multa_id")
 );
 
--- CreateTable
-CREATE TABLE "precios" (
-    "precio_id" TEXT NOT NULL,
-    "producto_id" TEXT NOT NULL,
-    "tienda_id" TEXT NOT NULL,
-    "precio" DECIMAL(65,30) NOT NULL,
-    "en_oferta" BOOLEAN NOT NULL DEFAULT false,
-    "precio_original" DECIMAL(65,30),
-    "disponible" BOOLEAN NOT NULL DEFAULT true,
-    "ultima_actualizacion" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "precios_pkey" PRIMARY KEY ("precio_id")
-);
-
 -- CreateIndex
 CREATE UNIQUE INDEX "usuarios_email_key" ON "usuarios"("email");
 
@@ -111,9 +93,6 @@ CREATE UNIQUE INDEX "sesiones_usuario_token_key" ON "sesiones_usuario"("token");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "tiendas_usuario_id_key" ON "tiendas"("usuario_id");
-
--- CreateIndex
-CREATE INDEX "precios_producto_id_tienda_id_idx" ON "precios"("producto_id", "tienda_id");
 
 -- AddForeignKey
 ALTER TABLE "perfiles_usuario" ADD CONSTRAINT "perfiles_usuario_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("usuario_id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -129,6 +108,3 @@ ALTER TABLE "multas" ADD CONSTRAINT "multas_tienda_id_fkey" FOREIGN KEY ("tienda
 
 -- AddForeignKey
 ALTER TABLE "multas" ADD CONSTRAINT "multas_usuario_id_fkey" FOREIGN KEY ("usuario_id") REFERENCES "usuarios"("usuario_id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "precios" ADD CONSTRAINT "precios_tienda_id_fkey" FOREIGN KEY ("tienda_id") REFERENCES "tiendas"("tienda_id") ON DELETE RESTRICT ON UPDATE CASCADE;

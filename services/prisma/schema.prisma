@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./client"
 }
 
 datasource db {
@@ -67,8 +66,6 @@ model Tienda {
   usuario_id  String   @unique
   nombre      String
   direccion   String?
-  latitud     Decimal?
-  longitud    Decimal?
   logo_url    String?
   is_activa   Boolean  @default(true)
   horario     String?  // "L-V: 9:00-18:00, S: 9:00-14:00"
@@ -77,7 +74,6 @@ model Tienda {
   // Relaciones
   usuario Usuario @relation(fields: [usuario_id], references: [usuario_id])
   multas  Multa[]
-  precios Precio[]  // Nueva relación con precios
 
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
@@ -104,26 +100,6 @@ model Multa {
   updated_at DateTime @updatedAt
 
   @@map("multas")
-}
-
-// NUEVO: Modelo para integrar con Product-Service
-model Precio {
-  precio_id    String   @id @default(uuid())
-  producto_id  String   // ID del producto en MongoDB
-  tienda_id    String
-  precio       Decimal
-  en_oferta    Boolean  @default(false)
-  precio_original Decimal?
-  disponible   Boolean  @default(true)
-  ultima_actualizacion DateTime @default(now())
-  
-  tienda Tienda @relation(fields: [tienda_id], references: [tienda_id])
-  
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([producto_id, tienda_id])
-  @@map("precios")
 }
 
 enum TipoUsuario {

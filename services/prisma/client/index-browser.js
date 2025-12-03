@@ -162,8 +162,6 @@ exports.Prisma.TiendaScalarFieldEnum = {
   usuario_id: 'usuario_id',
   nombre: 'nombre',
   direccion: 'direccion',
-  latitud: 'latitud',
-  longitud: 'longitud',
   logo_url: 'logo_url',
   is_activa: 'is_activa',
   horario: 'horario',
@@ -182,19 +180,6 @@ exports.Prisma.MultaScalarFieldEnum = {
   estado: 'estado',
   fecha_pago: 'fecha_pago',
   evidencia_url: 'evidencia_url',
-  created_at: 'created_at',
-  updated_at: 'updated_at'
-};
-
-exports.Prisma.PrecioScalarFieldEnum = {
-  precio_id: 'precio_id',
-  producto_id: 'producto_id',
-  tienda_id: 'tienda_id',
-  precio: 'precio',
-  en_oferta: 'en_oferta',
-  precio_original: 'precio_original',
-  disponible: 'disponible',
-  ultima_actualizacion: 'ultima_actualizacion',
   created_at: 'created_at',
   updated_at: 'updated_at'
 };
@@ -243,8 +228,7 @@ exports.Prisma.ModelName = {
   PerfilUsuario: 'PerfilUsuario',
   SesionUsuario: 'SesionUsuario',
   Tienda: 'Tienda',
-  Multa: 'Multa',
-  Precio: 'Precio'
+  Multa: 'Multa'
 };
 
 /**

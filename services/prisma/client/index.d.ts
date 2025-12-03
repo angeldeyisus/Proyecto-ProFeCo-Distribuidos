@@ -38,11 +38,6 @@ export type Tienda = $Result.DefaultSelection<Prisma.$TiendaPayload>
  * 
  */
 export type Multa = $Result.DefaultSelection<Prisma.$MultaPayload>
-/**
- * Model Precio
- * 
- */
-export type Precio = $Result.DefaultSelection<Prisma.$PrecioPayload>
 
 /**
  * Enums
@@ -244,16 +239,6 @@ export class PrismaClient<
     * ```
     */
   get multa(): Prisma.MultaDelegate<ExtArgs, ClientOptions>;
-
-  /**
-   * `prisma.precio`: Exposes CRUD operations for the **Precio** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more Precios
-    * const precios = await prisma.precio.findMany()
-    * ```
-    */
-  get precio(): Prisma.PrecioDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -699,8 +684,7 @@ export namespace Prisma {
     PerfilUsuario: 'PerfilUsuario',
     SesionUsuario: 'SesionUsuario',
     Tienda: 'Tienda',
-    Multa: 'Multa',
-    Precio: 'Precio'
+    Multa: 'Multa'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -719,7 +703,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "usuario" | "perfilUsuario" | "sesionUsuario" | "tienda" | "multa" | "precio"
+      modelProps: "usuario" | "perfilUsuario" | "sesionUsuario" | "tienda" | "multa"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1093,80 +1077,6 @@ export namespace Prisma {
           }
         }
       }
-      Precio: {
-        payload: Prisma.$PrecioPayload<ExtArgs>
-        fields: Prisma.PrecioFieldRefs
-        operations: {
-          findUnique: {
-            args: Prisma.PrecioFindUniqueArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.PrecioFindUniqueOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          findFirst: {
-            args: Prisma.PrecioFindFirstArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.PrecioFindFirstOrThrowArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          findMany: {
-            args: Prisma.PrecioFindManyArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>[]
-          }
-          create: {
-            args: Prisma.PrecioCreateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          createMany: {
-            args: Prisma.PrecioCreateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          createManyAndReturn: {
-            args: Prisma.PrecioCreateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>[]
-          }
-          delete: {
-            args: Prisma.PrecioDeleteArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          update: {
-            args: Prisma.PrecioUpdateArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          deleteMany: {
-            args: Prisma.PrecioDeleteManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateMany: {
-            args: Prisma.PrecioUpdateManyArgs<ExtArgs>
-            result: BatchPayload
-          }
-          updateManyAndReturn: {
-            args: Prisma.PrecioUpdateManyAndReturnArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>[]
-          }
-          upsert: {
-            args: Prisma.PrecioUpsertArgs<ExtArgs>
-            result: $Utils.PayloadToResult<Prisma.$PrecioPayload>
-          }
-          aggregate: {
-            args: Prisma.PrecioAggregateArgs<ExtArgs>
-            result: $Utils.Optional<AggregatePrecio>
-          }
-          groupBy: {
-            args: Prisma.PrecioGroupByArgs<ExtArgs>
-            result: $Utils.Optional<PrecioGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.PrecioCountArgs<ExtArgs>
-            result: $Utils.Optional<PrecioCountAggregateOutputType> | number
-          }
-        }
-      }
     }
   } & {
     other: {
@@ -1268,7 +1178,6 @@ export namespace Prisma {
     sesionUsuario?: SesionUsuarioOmit
     tienda?: TiendaOmit
     multa?: MultaOmit
-    precio?: PrecioOmit
   }
 
   /* Types for Logging */
@@ -1390,12 +1299,10 @@ export namespace Prisma {
 
   export type TiendaCountOutputType = {
     multas: number
-    precios: number
   }
 
   export type TiendaCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     multas?: boolean | TiendaCountOutputTypeCountMultasArgs
-    precios?: boolean | TiendaCountOutputTypeCountPreciosArgs
   }
 
   // Custom InputTypes
@@ -1414,13 +1321,6 @@ export namespace Prisma {
    */
   export type TiendaCountOutputTypeCountMultasArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MultaWhereInput
-  }
-
-  /**
-   * TiendaCountOutputType without action
-   */
-  export type TiendaCountOutputTypeCountPreciosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PrecioWhereInput
   }
 
 
@@ -4846,20 +4746,8 @@ export namespace Prisma {
 
   export type AggregateTienda = {
     _count: TiendaCountAggregateOutputType | null
-    _avg: TiendaAvgAggregateOutputType | null
-    _sum: TiendaSumAggregateOutputType | null
     _min: TiendaMinAggregateOutputType | null
     _max: TiendaMaxAggregateOutputType | null
-  }
-
-  export type TiendaAvgAggregateOutputType = {
-    latitud: Decimal | null
-    longitud: Decimal | null
-  }
-
-  export type TiendaSumAggregateOutputType = {
-    latitud: Decimal | null
-    longitud: Decimal | null
   }
 
   export type TiendaMinAggregateOutputType = {
@@ -4867,8 +4755,6 @@ export namespace Prisma {
     usuario_id: string | null
     nombre: string | null
     direccion: string | null
-    latitud: Decimal | null
-    longitud: Decimal | null
     logo_url: string | null
     is_activa: boolean | null
     horario: string | null
@@ -4882,8 +4768,6 @@ export namespace Prisma {
     usuario_id: string | null
     nombre: string | null
     direccion: string | null
-    latitud: Decimal | null
-    longitud: Decimal | null
     logo_url: string | null
     is_activa: boolean | null
     horario: string | null
@@ -4897,8 +4781,6 @@ export namespace Prisma {
     usuario_id: number
     nombre: number
     direccion: number
-    latitud: number
-    longitud: number
     logo_url: number
     is_activa: number
     horario: number
@@ -4909,23 +4791,11 @@ export namespace Prisma {
   }
 
 
-  export type TiendaAvgAggregateInputType = {
-    latitud?: true
-    longitud?: true
-  }
-
-  export type TiendaSumAggregateInputType = {
-    latitud?: true
-    longitud?: true
-  }
-
   export type TiendaMinAggregateInputType = {
     tienda_id?: true
     usuario_id?: true
     nombre?: true
     direccion?: true
-    latitud?: true
-    longitud?: true
     logo_url?: true
     is_activa?: true
     horario?: true
@@ -4939,8 +4809,6 @@ export namespace Prisma {
     usuario_id?: true
     nombre?: true
     direccion?: true
-    latitud?: true
-    longitud?: true
     logo_url?: true
     is_activa?: true
     horario?: true
@@ -4954,8 +4822,6 @@ export namespace Prisma {
     usuario_id?: true
     nombre?: true
     direccion?: true
-    latitud?: true
-    longitud?: true
     logo_url?: true
     is_activa?: true
     horario?: true
@@ -5003,18 +4869,6 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
-     * Select which fields to average
-    **/
-    _avg?: TiendaAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: TiendaSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
      * Select which fields to find the minimum value
     **/
     _min?: TiendaMinAggregateInputType
@@ -5045,8 +4899,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: TiendaCountAggregateInputType | true
-    _avg?: TiendaAvgAggregateInputType
-    _sum?: TiendaSumAggregateInputType
     _min?: TiendaMinAggregateInputType
     _max?: TiendaMaxAggregateInputType
   }
@@ -5056,8 +4908,6 @@ export namespace Prisma {
     usuario_id: string
     nombre: string
     direccion: string | null
-    latitud: Decimal | null
-    longitud: Decimal | null
     logo_url: string | null
     is_activa: boolean
     horario: string | null
@@ -5065,8 +4915,6 @@ export namespace Prisma {
     created_at: Date
     updated_at: Date
     _count: TiendaCountAggregateOutputType | null
-    _avg: TiendaAvgAggregateOutputType | null
-    _sum: TiendaSumAggregateOutputType | null
     _min: TiendaMinAggregateOutputType | null
     _max: TiendaMaxAggregateOutputType | null
   }
@@ -5090,8 +4938,6 @@ export namespace Prisma {
     usuario_id?: boolean
     nombre?: boolean
     direccion?: boolean
-    latitud?: boolean
-    longitud?: boolean
     logo_url?: boolean
     is_activa?: boolean
     horario?: boolean
@@ -5100,7 +4946,6 @@ export namespace Prisma {
     updated_at?: boolean
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     multas?: boolean | Tienda$multasArgs<ExtArgs>
-    precios?: boolean | Tienda$preciosArgs<ExtArgs>
     _count?: boolean | TiendaCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["tienda"]>
 
@@ -5109,8 +4954,6 @@ export namespace Prisma {
     usuario_id?: boolean
     nombre?: boolean
     direccion?: boolean
-    latitud?: boolean
-    longitud?: boolean
     logo_url?: boolean
     is_activa?: boolean
     horario?: boolean
@@ -5125,8 +4968,6 @@ export namespace Prisma {
     usuario_id?: boolean
     nombre?: boolean
     direccion?: boolean
-    latitud?: boolean
-    longitud?: boolean
     logo_url?: boolean
     is_activa?: boolean
     horario?: boolean
@@ -5141,8 +4982,6 @@ export namespace Prisma {
     usuario_id?: boolean
     nombre?: boolean
     direccion?: boolean
-    latitud?: boolean
-    longitud?: boolean
     logo_url?: boolean
     is_activa?: boolean
     horario?: boolean
@@ -5151,11 +4990,10 @@ export namespace Prisma {
     updated_at?: boolean
   }
 
-  export type TiendaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"tienda_id" | "usuario_id" | "nombre" | "direccion" | "latitud" | "longitud" | "logo_url" | "is_activa" | "horario" | "telefono" | "created_at" | "updated_at", ExtArgs["result"]["tienda"]>
+  export type TiendaOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"tienda_id" | "usuario_id" | "nombre" | "direccion" | "logo_url" | "is_activa" | "horario" | "telefono" | "created_at" | "updated_at", ExtArgs["result"]["tienda"]>
   export type TiendaInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     usuario?: boolean | UsuarioDefaultArgs<ExtArgs>
     multas?: boolean | Tienda$multasArgs<ExtArgs>
-    precios?: boolean | Tienda$preciosArgs<ExtArgs>
     _count?: boolean | TiendaCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TiendaIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5170,15 +5008,12 @@ export namespace Prisma {
     objects: {
       usuario: Prisma.$UsuarioPayload<ExtArgs>
       multas: Prisma.$MultaPayload<ExtArgs>[]
-      precios: Prisma.$PrecioPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       tienda_id: string
       usuario_id: string
       nombre: string
       direccion: string | null
-      latitud: Prisma.Decimal | null
-      longitud: Prisma.Decimal | null
       logo_url: string | null
       is_activa: boolean
       horario: string | null
@@ -5581,7 +5416,6 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     usuario<T extends UsuarioDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UsuarioDefaultArgs<ExtArgs>>): Prisma__UsuarioClient<$Result.GetResult<Prisma.$UsuarioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     multas<T extends Tienda$multasArgs<ExtArgs> = {}>(args?: Subset<T, Tienda$multasArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MultaPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    precios<T extends Tienda$preciosArgs<ExtArgs> = {}>(args?: Subset<T, Tienda$preciosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5615,8 +5449,6 @@ export namespace Prisma {
     readonly usuario_id: FieldRef<"Tienda", 'String'>
     readonly nombre: FieldRef<"Tienda", 'String'>
     readonly direccion: FieldRef<"Tienda", 'String'>
-    readonly latitud: FieldRef<"Tienda", 'Decimal'>
-    readonly longitud: FieldRef<"Tienda", 'Decimal'>
     readonly logo_url: FieldRef<"Tienda", 'String'>
     readonly is_activa: FieldRef<"Tienda", 'Boolean'>
     readonly horario: FieldRef<"Tienda", 'String'>
@@ -6040,30 +5872,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MultaScalarFieldEnum | MultaScalarFieldEnum[]
-  }
-
-  /**
-   * Tienda.precios
-   */
-  export type Tienda$preciosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    where?: PrecioWhereInput
-    orderBy?: PrecioOrderByWithRelationInput | PrecioOrderByWithRelationInput[]
-    cursor?: PrecioWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: PrecioScalarFieldEnum | PrecioScalarFieldEnum[]
   }
 
   /**
@@ -7283,1167 +7091,6 @@ export namespace Prisma {
 
 
   /**
-   * Model Precio
-   */
-
-  export type AggregatePrecio = {
-    _count: PrecioCountAggregateOutputType | null
-    _avg: PrecioAvgAggregateOutputType | null
-    _sum: PrecioSumAggregateOutputType | null
-    _min: PrecioMinAggregateOutputType | null
-    _max: PrecioMaxAggregateOutputType | null
-  }
-
-  export type PrecioAvgAggregateOutputType = {
-    precio: Decimal | null
-    precio_original: Decimal | null
-  }
-
-  export type PrecioSumAggregateOutputType = {
-    precio: Decimal | null
-    precio_original: Decimal | null
-  }
-
-  export type PrecioMinAggregateOutputType = {
-    precio_id: string | null
-    producto_id: string | null
-    tienda_id: string | null
-    precio: Decimal | null
-    en_oferta: boolean | null
-    precio_original: Decimal | null
-    disponible: boolean | null
-    ultima_actualizacion: Date | null
-    created_at: Date | null
-    updated_at: Date | null
-  }
-
-  export type PrecioMaxAggregateOutputType = {
-    precio_id: string | null
-    producto_id: string | null
-    tienda_id: string | null
-    precio: Decimal | null
-    en_oferta: boolean | null
-    precio_original: Decimal | null
-    disponible: boolean | null
-    ultima_actualizacion: Date | null
-    created_at: Date | null
-    updated_at: Date | null
-  }
-
-  export type PrecioCountAggregateOutputType = {
-    precio_id: number
-    producto_id: number
-    tienda_id: number
-    precio: number
-    en_oferta: number
-    precio_original: number
-    disponible: number
-    ultima_actualizacion: number
-    created_at: number
-    updated_at: number
-    _all: number
-  }
-
-
-  export type PrecioAvgAggregateInputType = {
-    precio?: true
-    precio_original?: true
-  }
-
-  export type PrecioSumAggregateInputType = {
-    precio?: true
-    precio_original?: true
-  }
-
-  export type PrecioMinAggregateInputType = {
-    precio_id?: true
-    producto_id?: true
-    tienda_id?: true
-    precio?: true
-    en_oferta?: true
-    precio_original?: true
-    disponible?: true
-    ultima_actualizacion?: true
-    created_at?: true
-    updated_at?: true
-  }
-
-  export type PrecioMaxAggregateInputType = {
-    precio_id?: true
-    producto_id?: true
-    tienda_id?: true
-    precio?: true
-    en_oferta?: true
-    precio_original?: true
-    disponible?: true
-    ultima_actualizacion?: true
-    created_at?: true
-    updated_at?: true
-  }
-
-  export type PrecioCountAggregateInputType = {
-    precio_id?: true
-    producto_id?: true
-    tienda_id?: true
-    precio?: true
-    en_oferta?: true
-    precio_original?: true
-    disponible?: true
-    ultima_actualizacion?: true
-    created_at?: true
-    updated_at?: true
-    _all?: true
-  }
-
-  export type PrecioAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Precio to aggregate.
-     */
-    where?: PrecioWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Precios to fetch.
-     */
-    orderBy?: PrecioOrderByWithRelationInput | PrecioOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: PrecioWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Precios from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Precios.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned Precios
-    **/
-    _count?: true | PrecioCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to average
-    **/
-    _avg?: PrecioAvgAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to sum
-    **/
-    _sum?: PrecioSumAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: PrecioMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: PrecioMaxAggregateInputType
-  }
-
-  export type GetPrecioAggregateType<T extends PrecioAggregateArgs> = {
-        [P in keyof T & keyof AggregatePrecio]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregatePrecio[P]>
-      : GetScalarType<T[P], AggregatePrecio[P]>
-  }
-
-
-
-
-  export type PrecioGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: PrecioWhereInput
-    orderBy?: PrecioOrderByWithAggregationInput | PrecioOrderByWithAggregationInput[]
-    by: PrecioScalarFieldEnum[] | PrecioScalarFieldEnum
-    having?: PrecioScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: PrecioCountAggregateInputType | true
-    _avg?: PrecioAvgAggregateInputType
-    _sum?: PrecioSumAggregateInputType
-    _min?: PrecioMinAggregateInputType
-    _max?: PrecioMaxAggregateInputType
-  }
-
-  export type PrecioGroupByOutputType = {
-    precio_id: string
-    producto_id: string
-    tienda_id: string
-    precio: Decimal
-    en_oferta: boolean
-    precio_original: Decimal | null
-    disponible: boolean
-    ultima_actualizacion: Date
-    created_at: Date
-    updated_at: Date
-    _count: PrecioCountAggregateOutputType | null
-    _avg: PrecioAvgAggregateOutputType | null
-    _sum: PrecioSumAggregateOutputType | null
-    _min: PrecioMinAggregateOutputType | null
-    _max: PrecioMaxAggregateOutputType | null
-  }
-
-  type GetPrecioGroupByPayload<T extends PrecioGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickEnumerable<PrecioGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof PrecioGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], PrecioGroupByOutputType[P]>
-            : GetScalarType<T[P], PrecioGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type PrecioSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    precio_id?: boolean
-    producto_id?: boolean
-    tienda_id?: boolean
-    precio?: boolean
-    en_oferta?: boolean
-    precio_original?: boolean
-    disponible?: boolean
-    ultima_actualizacion?: boolean
-    created_at?: boolean
-    updated_at?: boolean
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["precio"]>
-
-  export type PrecioSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    precio_id?: boolean
-    producto_id?: boolean
-    tienda_id?: boolean
-    precio?: boolean
-    en_oferta?: boolean
-    precio_original?: boolean
-    disponible?: boolean
-    ultima_actualizacion?: boolean
-    created_at?: boolean
-    updated_at?: boolean
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["precio"]>
-
-  export type PrecioSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    precio_id?: boolean
-    producto_id?: boolean
-    tienda_id?: boolean
-    precio?: boolean
-    en_oferta?: boolean
-    precio_original?: boolean
-    disponible?: boolean
-    ultima_actualizacion?: boolean
-    created_at?: boolean
-    updated_at?: boolean
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }, ExtArgs["result"]["precio"]>
-
-  export type PrecioSelectScalar = {
-    precio_id?: boolean
-    producto_id?: boolean
-    tienda_id?: boolean
-    precio?: boolean
-    en_oferta?: boolean
-    precio_original?: boolean
-    disponible?: boolean
-    ultima_actualizacion?: boolean
-    created_at?: boolean
-    updated_at?: boolean
-  }
-
-  export type PrecioOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"precio_id" | "producto_id" | "tienda_id" | "precio" | "en_oferta" | "precio_original" | "disponible" | "ultima_actualizacion" | "created_at" | "updated_at", ExtArgs["result"]["precio"]>
-  export type PrecioInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }
-  export type PrecioIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }
-  export type PrecioIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    tienda?: boolean | TiendaDefaultArgs<ExtArgs>
-  }
-
-  export type $PrecioPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    name: "Precio"
-    objects: {
-      tienda: Prisma.$TiendaPayload<ExtArgs>
-    }
-    scalars: $Extensions.GetPayloadResult<{
-      precio_id: string
-      producto_id: string
-      tienda_id: string
-      precio: Prisma.Decimal
-      en_oferta: boolean
-      precio_original: Prisma.Decimal | null
-      disponible: boolean
-      ultima_actualizacion: Date
-      created_at: Date
-      updated_at: Date
-    }, ExtArgs["result"]["precio"]>
-    composites: {}
-  }
-
-  type PrecioGetPayload<S extends boolean | null | undefined | PrecioDefaultArgs> = $Result.GetResult<Prisma.$PrecioPayload, S>
-
-  type PrecioCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
-    Omit<PrecioFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
-      select?: PrecioCountAggregateInputType | true
-    }
-
-  export interface PrecioDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Precio'], meta: { name: 'Precio' } }
-    /**
-     * Find zero or one Precio that matches the filter.
-     * @param {PrecioFindUniqueArgs} args - Arguments to find a Precio
-     * @example
-     * // Get one Precio
-     * const precio = await prisma.precio.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUnique<T extends PrecioFindUniqueArgs>(args: SelectSubset<T, PrecioFindUniqueArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find one Precio that matches the filter or throw an error with `error.code='P2025'`
-     * if no matches were found.
-     * @param {PrecioFindUniqueOrThrowArgs} args - Arguments to find a Precio
-     * @example
-     * // Get one Precio
-     * const precio = await prisma.precio.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findUniqueOrThrow<T extends PrecioFindUniqueOrThrowArgs>(args: SelectSubset<T, PrecioFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Precio that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioFindFirstArgs} args - Arguments to find a Precio
-     * @example
-     * // Get one Precio
-     * const precio = await prisma.precio.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirst<T extends PrecioFindFirstArgs>(args?: SelectSubset<T, PrecioFindFirstArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find the first Precio that matches the filter or
-     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioFindFirstOrThrowArgs} args - Arguments to find a Precio
-     * @example
-     * // Get one Precio
-     * const precio = await prisma.precio.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     */
-    findFirstOrThrow<T extends PrecioFindFirstOrThrowArgs>(args?: SelectSubset<T, PrecioFindFirstOrThrowArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Find zero or more Precios that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioFindManyArgs} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all Precios
-     * const precios = await prisma.precio.findMany()
-     * 
-     * // Get first 10 Precios
-     * const precios = await prisma.precio.findMany({ take: 10 })
-     * 
-     * // Only select the `precio_id`
-     * const precioWithPrecio_idOnly = await prisma.precio.findMany({ select: { precio_id: true } })
-     * 
-     */
-    findMany<T extends PrecioFindManyArgs>(args?: SelectSubset<T, PrecioFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
-
-    /**
-     * Create a Precio.
-     * @param {PrecioCreateArgs} args - Arguments to create a Precio.
-     * @example
-     * // Create one Precio
-     * const Precio = await prisma.precio.create({
-     *   data: {
-     *     // ... data to create a Precio
-     *   }
-     * })
-     * 
-     */
-    create<T extends PrecioCreateArgs>(args: SelectSubset<T, PrecioCreateArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Create many Precios.
-     * @param {PrecioCreateManyArgs} args - Arguments to create many Precios.
-     * @example
-     * // Create many Precios
-     * const precio = await prisma.precio.createMany({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     *     
-     */
-    createMany<T extends PrecioCreateManyArgs>(args?: SelectSubset<T, PrecioCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create many Precios and returns the data saved in the database.
-     * @param {PrecioCreateManyAndReturnArgs} args - Arguments to create many Precios.
-     * @example
-     * // Create many Precios
-     * const precio = await prisma.precio.createManyAndReturn({
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Create many Precios and only return the `precio_id`
-     * const precioWithPrecio_idOnly = await prisma.precio.createManyAndReturn({
-     *   select: { precio_id: true },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    createManyAndReturn<T extends PrecioCreateManyAndReturnArgs>(args?: SelectSubset<T, PrecioCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Delete a Precio.
-     * @param {PrecioDeleteArgs} args - Arguments to delete one Precio.
-     * @example
-     * // Delete one Precio
-     * const Precio = await prisma.precio.delete({
-     *   where: {
-     *     // ... filter to delete one Precio
-     *   }
-     * })
-     * 
-     */
-    delete<T extends PrecioDeleteArgs>(args: SelectSubset<T, PrecioDeleteArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Update one Precio.
-     * @param {PrecioUpdateArgs} args - Arguments to update one Precio.
-     * @example
-     * // Update one Precio
-     * const precio = await prisma.precio.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    update<T extends PrecioUpdateArgs>(args: SelectSubset<T, PrecioUpdateArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-    /**
-     * Delete zero or more Precios.
-     * @param {PrecioDeleteManyArgs} args - Arguments to filter Precios to delete.
-     * @example
-     * // Delete a few Precios
-     * const { count } = await prisma.precio.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-     */
-    deleteMany<T extends PrecioDeleteManyArgs>(args?: SelectSubset<T, PrecioDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Precios.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many Precios
-     * const precio = await prisma.precio.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-     */
-    updateMany<T extends PrecioUpdateManyArgs>(args: SelectSubset<T, PrecioUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more Precios and returns the data updated in the database.
-     * @param {PrecioUpdateManyAndReturnArgs} args - Arguments to update many Precios.
-     * @example
-     * // Update many Precios
-     * const precio = await prisma.precio.updateManyAndReturn({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * 
-     * // Update zero or more Precios and only return the `precio_id`
-     * const precioWithPrecio_idOnly = await prisma.precio.updateManyAndReturn({
-     *   select: { precio_id: true },
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: [
-     *     // ... provide data here
-     *   ]
-     * })
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * 
-     */
-    updateManyAndReturn<T extends PrecioUpdateManyAndReturnArgs>(args: SelectSubset<T, PrecioUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
-
-    /**
-     * Create or update one Precio.
-     * @param {PrecioUpsertArgs} args - Arguments to update or create a Precio.
-     * @example
-     * // Update or create a Precio
-     * const precio = await prisma.precio.upsert({
-     *   create: {
-     *     // ... data to create a Precio
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the Precio we want to update
-     *   }
-     * })
-     */
-    upsert<T extends PrecioUpsertArgs>(args: SelectSubset<T, PrecioUpsertArgs<ExtArgs>>): Prisma__PrecioClient<$Result.GetResult<Prisma.$PrecioPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
-
-
-    /**
-     * Count the number of Precios.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioCountArgs} args - Arguments to filter Precios to count.
-     * @example
-     * // Count the number of Precios
-     * const count = await prisma.precio.count({
-     *   where: {
-     *     // ... the filter for the Precios we want to count
-     *   }
-     * })
-    **/
-    count<T extends PrecioCountArgs>(
-      args?: Subset<T, PrecioCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], PrecioCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a Precio.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends PrecioAggregateArgs>(args: Subset<T, PrecioAggregateArgs>): Prisma.PrismaPromise<GetPrecioAggregateType<T>>
-
-    /**
-     * Group by Precio.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {PrecioGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends PrecioGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: PrecioGroupByArgs['orderBy'] }
-        : { orderBy?: PrecioGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends MaybeTupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, PrecioGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPrecioGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-  /**
-   * Fields of the Precio model
-   */
-  readonly fields: PrecioFieldRefs;
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for Precio.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export interface Prisma__PrecioClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
-    readonly [Symbol.toStringTag]: "PrismaPromise"
-    tienda<T extends TiendaDefaultArgs<ExtArgs> = {}>(args?: Subset<T, TiendaDefaultArgs<ExtArgs>>): Prisma__TiendaClient<$Result.GetResult<Prisma.$TiendaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
-  }
-
-
-
-
-  /**
-   * Fields of the Precio model
-   */
-  interface PrecioFieldRefs {
-    readonly precio_id: FieldRef<"Precio", 'String'>
-    readonly producto_id: FieldRef<"Precio", 'String'>
-    readonly tienda_id: FieldRef<"Precio", 'String'>
-    readonly precio: FieldRef<"Precio", 'Decimal'>
-    readonly en_oferta: FieldRef<"Precio", 'Boolean'>
-    readonly precio_original: FieldRef<"Precio", 'Decimal'>
-    readonly disponible: FieldRef<"Precio", 'Boolean'>
-    readonly ultima_actualizacion: FieldRef<"Precio", 'DateTime'>
-    readonly created_at: FieldRef<"Precio", 'DateTime'>
-    readonly updated_at: FieldRef<"Precio", 'DateTime'>
-  }
-    
-
-  // Custom InputTypes
-  /**
-   * Precio findUnique
-   */
-  export type PrecioFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter, which Precio to fetch.
-     */
-    where: PrecioWhereUniqueInput
-  }
-
-  /**
-   * Precio findUniqueOrThrow
-   */
-  export type PrecioFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter, which Precio to fetch.
-     */
-    where: PrecioWhereUniqueInput
-  }
-
-  /**
-   * Precio findFirst
-   */
-  export type PrecioFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter, which Precio to fetch.
-     */
-    where?: PrecioWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Precios to fetch.
-     */
-    orderBy?: PrecioOrderByWithRelationInput | PrecioOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Precios.
-     */
-    cursor?: PrecioWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Precios from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Precios.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Precios.
-     */
-    distinct?: PrecioScalarFieldEnum | PrecioScalarFieldEnum[]
-  }
-
-  /**
-   * Precio findFirstOrThrow
-   */
-  export type PrecioFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter, which Precio to fetch.
-     */
-    where?: PrecioWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Precios to fetch.
-     */
-    orderBy?: PrecioOrderByWithRelationInput | PrecioOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for Precios.
-     */
-    cursor?: PrecioWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Precios from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Precios.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of Precios.
-     */
-    distinct?: PrecioScalarFieldEnum | PrecioScalarFieldEnum[]
-  }
-
-  /**
-   * Precio findMany
-   */
-  export type PrecioFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter, which Precios to fetch.
-     */
-    where?: PrecioWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of Precios to fetch.
-     */
-    orderBy?: PrecioOrderByWithRelationInput | PrecioOrderByWithRelationInput[]
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing Precios.
-     */
-    cursor?: PrecioWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` Precios from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` Precios.
-     */
-    skip?: number
-    distinct?: PrecioScalarFieldEnum | PrecioScalarFieldEnum[]
-  }
-
-  /**
-   * Precio create
-   */
-  export type PrecioCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * The data needed to create a Precio.
-     */
-    data: XOR<PrecioCreateInput, PrecioUncheckedCreateInput>
-  }
-
-  /**
-   * Precio createMany
-   */
-  export type PrecioCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many Precios.
-     */
-    data: PrecioCreateManyInput | PrecioCreateManyInput[]
-    skipDuplicates?: boolean
-  }
-
-  /**
-   * Precio createManyAndReturn
-   */
-  export type PrecioCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelectCreateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * The data used to create many Precios.
-     */
-    data: PrecioCreateManyInput | PrecioCreateManyInput[]
-    skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioIncludeCreateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Precio update
-   */
-  export type PrecioUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * The data needed to update a Precio.
-     */
-    data: XOR<PrecioUpdateInput, PrecioUncheckedUpdateInput>
-    /**
-     * Choose, which Precio to update.
-     */
-    where: PrecioWhereUniqueInput
-  }
-
-  /**
-   * Precio updateMany
-   */
-  export type PrecioUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update Precios.
-     */
-    data: XOR<PrecioUpdateManyMutationInput, PrecioUncheckedUpdateManyInput>
-    /**
-     * Filter which Precios to update
-     */
-    where?: PrecioWhereInput
-    /**
-     * Limit how many Precios to update.
-     */
-    limit?: number
-  }
-
-  /**
-   * Precio updateManyAndReturn
-   */
-  export type PrecioUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelectUpdateManyAndReturn<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * The data used to update Precios.
-     */
-    data: XOR<PrecioUpdateManyMutationInput, PrecioUncheckedUpdateManyInput>
-    /**
-     * Filter which Precios to update
-     */
-    where?: PrecioWhereInput
-    /**
-     * Limit how many Precios to update.
-     */
-    limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioIncludeUpdateManyAndReturn<ExtArgs> | null
-  }
-
-  /**
-   * Precio upsert
-   */
-  export type PrecioUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * The filter to search for the Precio to update in case it exists.
-     */
-    where: PrecioWhereUniqueInput
-    /**
-     * In case the Precio found by the `where` argument doesn't exist, create a new Precio with this data.
-     */
-    create: XOR<PrecioCreateInput, PrecioUncheckedCreateInput>
-    /**
-     * In case the Precio was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<PrecioUpdateInput, PrecioUncheckedUpdateInput>
-  }
-
-  /**
-   * Precio delete
-   */
-  export type PrecioDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-    /**
-     * Filter which Precio to delete.
-     */
-    where: PrecioWhereUniqueInput
-  }
-
-  /**
-   * Precio deleteMany
-   */
-  export type PrecioDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which Precios to delete
-     */
-    where?: PrecioWhereInput
-    /**
-     * Limit how many Precios to delete.
-     */
-    limit?: number
-  }
-
-  /**
-   * Precio without action
-   */
-  export type PrecioDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Precio
-     */
-    select?: PrecioSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Precio
-     */
-    omit?: PrecioOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: PrecioInclude<ExtArgs> | null
-  }
-
-
-  /**
    * Enums
    */
 
@@ -8507,8 +7154,6 @@ export namespace Prisma {
     usuario_id: 'usuario_id',
     nombre: 'nombre',
     direccion: 'direccion',
-    latitud: 'latitud',
-    longitud: 'longitud',
     logo_url: 'logo_url',
     is_activa: 'is_activa',
     horario: 'horario',
@@ -8535,22 +7180,6 @@ export namespace Prisma {
   };
 
   export type MultaScalarFieldEnum = (typeof MultaScalarFieldEnum)[keyof typeof MultaScalarFieldEnum]
-
-
-  export const PrecioScalarFieldEnum: {
-    precio_id: 'precio_id',
-    producto_id: 'producto_id',
-    tienda_id: 'tienda_id',
-    precio: 'precio',
-    en_oferta: 'en_oferta',
-    precio_original: 'precio_original',
-    disponible: 'disponible',
-    ultima_actualizacion: 'ultima_actualizacion',
-    created_at: 'created_at',
-    updated_at: 'updated_at'
-  };
-
-  export type PrecioScalarFieldEnum = (typeof PrecioScalarFieldEnum)[keyof typeof PrecioScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -8949,8 +7578,6 @@ export namespace Prisma {
     usuario_id?: StringFilter<"Tienda"> | string
     nombre?: StringFilter<"Tienda"> | string
     direccion?: StringNullableFilter<"Tienda"> | string | null
-    latitud?: DecimalNullableFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
-    longitud?: DecimalNullableFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
     logo_url?: StringNullableFilter<"Tienda"> | string | null
     is_activa?: BoolFilter<"Tienda"> | boolean
     horario?: StringNullableFilter<"Tienda"> | string | null
@@ -8959,7 +7586,6 @@ export namespace Prisma {
     updated_at?: DateTimeFilter<"Tienda"> | Date | string
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     multas?: MultaListRelationFilter
-    precios?: PrecioListRelationFilter
   }
 
   export type TiendaOrderByWithRelationInput = {
@@ -8967,8 +7593,6 @@ export namespace Prisma {
     usuario_id?: SortOrder
     nombre?: SortOrder
     direccion?: SortOrderInput | SortOrder
-    latitud?: SortOrderInput | SortOrder
-    longitud?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
     is_activa?: SortOrder
     horario?: SortOrderInput | SortOrder
@@ -8977,7 +7601,6 @@ export namespace Prisma {
     updated_at?: SortOrder
     usuario?: UsuarioOrderByWithRelationInput
     multas?: MultaOrderByRelationAggregateInput
-    precios?: PrecioOrderByRelationAggregateInput
   }
 
   export type TiendaWhereUniqueInput = Prisma.AtLeast<{
@@ -8988,8 +7611,6 @@ export namespace Prisma {
     NOT?: TiendaWhereInput | TiendaWhereInput[]
     nombre?: StringFilter<"Tienda"> | string
     direccion?: StringNullableFilter<"Tienda"> | string | null
-    latitud?: DecimalNullableFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
-    longitud?: DecimalNullableFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
     logo_url?: StringNullableFilter<"Tienda"> | string | null
     is_activa?: BoolFilter<"Tienda"> | boolean
     horario?: StringNullableFilter<"Tienda"> | string | null
@@ -8998,7 +7619,6 @@ export namespace Prisma {
     updated_at?: DateTimeFilter<"Tienda"> | Date | string
     usuario?: XOR<UsuarioScalarRelationFilter, UsuarioWhereInput>
     multas?: MultaListRelationFilter
-    precios?: PrecioListRelationFilter
   }, "tienda_id" | "usuario_id">
 
   export type TiendaOrderByWithAggregationInput = {
@@ -9006,8 +7626,6 @@ export namespace Prisma {
     usuario_id?: SortOrder
     nombre?: SortOrder
     direccion?: SortOrderInput | SortOrder
-    latitud?: SortOrderInput | SortOrder
-    longitud?: SortOrderInput | SortOrder
     logo_url?: SortOrderInput | SortOrder
     is_activa?: SortOrder
     horario?: SortOrderInput | SortOrder
@@ -9015,10 +7633,8 @@ export namespace Prisma {
     created_at?: SortOrder
     updated_at?: SortOrder
     _count?: TiendaCountOrderByAggregateInput
-    _avg?: TiendaAvgOrderByAggregateInput
     _max?: TiendaMaxOrderByAggregateInput
     _min?: TiendaMinOrderByAggregateInput
-    _sum?: TiendaSumOrderByAggregateInput
   }
 
   export type TiendaScalarWhereWithAggregatesInput = {
@@ -9029,8 +7645,6 @@ export namespace Prisma {
     usuario_id?: StringWithAggregatesFilter<"Tienda"> | string
     nombre?: StringWithAggregatesFilter<"Tienda"> | string
     direccion?: StringNullableWithAggregatesFilter<"Tienda"> | string | null
-    latitud?: DecimalNullableWithAggregatesFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
-    longitud?: DecimalNullableWithAggregatesFilter<"Tienda"> | Decimal | DecimalJsLike | number | string | null
     logo_url?: StringNullableWithAggregatesFilter<"Tienda"> | string | null
     is_activa?: BoolWithAggregatesFilter<"Tienda"> | boolean
     horario?: StringNullableWithAggregatesFilter<"Tienda"> | string | null
@@ -9127,88 +7741,6 @@ export namespace Prisma {
     evidencia_url?: StringNullableWithAggregatesFilter<"Multa"> | string | null
     created_at?: DateTimeWithAggregatesFilter<"Multa"> | Date | string
     updated_at?: DateTimeWithAggregatesFilter<"Multa"> | Date | string
-  }
-
-  export type PrecioWhereInput = {
-    AND?: PrecioWhereInput | PrecioWhereInput[]
-    OR?: PrecioWhereInput[]
-    NOT?: PrecioWhereInput | PrecioWhereInput[]
-    precio_id?: StringFilter<"Precio"> | string
-    producto_id?: StringFilter<"Precio"> | string
-    tienda_id?: StringFilter<"Precio"> | string
-    precio?: DecimalFilter<"Precio"> | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFilter<"Precio"> | boolean
-    precio_original?: DecimalNullableFilter<"Precio"> | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFilter<"Precio"> | boolean
-    ultima_actualizacion?: DateTimeFilter<"Precio"> | Date | string
-    created_at?: DateTimeFilter<"Precio"> | Date | string
-    updated_at?: DateTimeFilter<"Precio"> | Date | string
-    tienda?: XOR<TiendaScalarRelationFilter, TiendaWhereInput>
-  }
-
-  export type PrecioOrderByWithRelationInput = {
-    precio_id?: SortOrder
-    producto_id?: SortOrder
-    tienda_id?: SortOrder
-    precio?: SortOrder
-    en_oferta?: SortOrder
-    precio_original?: SortOrderInput | SortOrder
-    disponible?: SortOrder
-    ultima_actualizacion?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-    tienda?: TiendaOrderByWithRelationInput
-  }
-
-  export type PrecioWhereUniqueInput = Prisma.AtLeast<{
-    precio_id?: string
-    AND?: PrecioWhereInput | PrecioWhereInput[]
-    OR?: PrecioWhereInput[]
-    NOT?: PrecioWhereInput | PrecioWhereInput[]
-    producto_id?: StringFilter<"Precio"> | string
-    tienda_id?: StringFilter<"Precio"> | string
-    precio?: DecimalFilter<"Precio"> | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFilter<"Precio"> | boolean
-    precio_original?: DecimalNullableFilter<"Precio"> | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFilter<"Precio"> | boolean
-    ultima_actualizacion?: DateTimeFilter<"Precio"> | Date | string
-    created_at?: DateTimeFilter<"Precio"> | Date | string
-    updated_at?: DateTimeFilter<"Precio"> | Date | string
-    tienda?: XOR<TiendaScalarRelationFilter, TiendaWhereInput>
-  }, "precio_id">
-
-  export type PrecioOrderByWithAggregationInput = {
-    precio_id?: SortOrder
-    producto_id?: SortOrder
-    tienda_id?: SortOrder
-    precio?: SortOrder
-    en_oferta?: SortOrder
-    precio_original?: SortOrderInput | SortOrder
-    disponible?: SortOrder
-    ultima_actualizacion?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-    _count?: PrecioCountOrderByAggregateInput
-    _avg?: PrecioAvgOrderByAggregateInput
-    _max?: PrecioMaxOrderByAggregateInput
-    _min?: PrecioMinOrderByAggregateInput
-    _sum?: PrecioSumOrderByAggregateInput
-  }
-
-  export type PrecioScalarWhereWithAggregatesInput = {
-    AND?: PrecioScalarWhereWithAggregatesInput | PrecioScalarWhereWithAggregatesInput[]
-    OR?: PrecioScalarWhereWithAggregatesInput[]
-    NOT?: PrecioScalarWhereWithAggregatesInput | PrecioScalarWhereWithAggregatesInput[]
-    precio_id?: StringWithAggregatesFilter<"Precio"> | string
-    producto_id?: StringWithAggregatesFilter<"Precio"> | string
-    tienda_id?: StringWithAggregatesFilter<"Precio"> | string
-    precio?: DecimalWithAggregatesFilter<"Precio"> | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolWithAggregatesFilter<"Precio"> | boolean
-    precio_original?: DecimalNullableWithAggregatesFilter<"Precio"> | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolWithAggregatesFilter<"Precio"> | boolean
-    ultima_actualizacion?: DateTimeWithAggregatesFilter<"Precio"> | Date | string
-    created_at?: DateTimeWithAggregatesFilter<"Precio"> | Date | string
-    updated_at?: DateTimeWithAggregatesFilter<"Precio"> | Date | string
   }
 
   export type UsuarioCreateInput = {
@@ -9481,8 +8013,6 @@ export namespace Prisma {
     tienda_id?: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -9491,7 +8021,6 @@ export namespace Prisma {
     updated_at?: Date | string
     usuario: UsuarioCreateNestedOneWithoutTiendaInput
     multas?: MultaCreateNestedManyWithoutTiendaInput
-    precios?: PrecioCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaUncheckedCreateInput = {
@@ -9499,8 +8028,6 @@ export namespace Prisma {
     usuario_id: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -9508,15 +8035,12 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     multas?: MultaUncheckedCreateNestedManyWithoutTiendaInput
-    precios?: PrecioUncheckedCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaUpdateInput = {
     tienda_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9525,7 +8049,6 @@ export namespace Prisma {
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     usuario?: UsuarioUpdateOneRequiredWithoutTiendaNestedInput
     multas?: MultaUpdateManyWithoutTiendaNestedInput
-    precios?: PrecioUpdateManyWithoutTiendaNestedInput
   }
 
   export type TiendaUncheckedUpdateInput = {
@@ -9533,8 +8056,6 @@ export namespace Prisma {
     usuario_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9542,7 +8063,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     multas?: MultaUncheckedUpdateManyWithoutTiendaNestedInput
-    precios?: PrecioUncheckedUpdateManyWithoutTiendaNestedInput
   }
 
   export type TiendaCreateManyInput = {
@@ -9550,8 +8070,6 @@ export namespace Prisma {
     usuario_id: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -9564,8 +8082,6 @@ export namespace Prisma {
     tienda_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9579,8 +8095,6 @@ export namespace Prisma {
     usuario_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9681,96 +8195,6 @@ export namespace Prisma {
     estado?: EnumEstadoMultaFieldUpdateOperationsInput | $Enums.EstadoMulta
     fecha_pago?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     evidencia_url?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioCreateInput = {
-    precio_id?: string
-    producto_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-    tienda: TiendaCreateNestedOneWithoutPreciosInput
-  }
-
-  export type PrecioUncheckedCreateInput = {
-    precio_id?: string
-    producto_id: string
-    tienda_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-  }
-
-  export type PrecioUpdateInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    tienda?: TiendaUpdateOneRequiredWithoutPreciosNestedInput
-  }
-
-  export type PrecioUncheckedUpdateInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    tienda_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioCreateManyInput = {
-    precio_id?: string
-    producto_id: string
-    tienda_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-  }
-
-  export type PrecioUpdateManyMutationInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioUncheckedUpdateManyInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    tienda_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -10116,34 +8540,11 @@ export namespace Prisma {
     created_at?: SortOrder
   }
 
-  export type DecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-  }
-
-  export type PrecioListRelationFilter = {
-    every?: PrecioWhereInput
-    some?: PrecioWhereInput
-    none?: PrecioWhereInput
-  }
-
-  export type PrecioOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type TiendaCountOrderByAggregateInput = {
     tienda_id?: SortOrder
     usuario_id?: SortOrder
     nombre?: SortOrder
     direccion?: SortOrder
-    latitud?: SortOrder
-    longitud?: SortOrder
     logo_url?: SortOrder
     is_activa?: SortOrder
     horario?: SortOrder
@@ -10152,18 +8553,11 @@ export namespace Prisma {
     updated_at?: SortOrder
   }
 
-  export type TiendaAvgOrderByAggregateInput = {
-    latitud?: SortOrder
-    longitud?: SortOrder
-  }
-
   export type TiendaMaxOrderByAggregateInput = {
     tienda_id?: SortOrder
     usuario_id?: SortOrder
     nombre?: SortOrder
     direccion?: SortOrder
-    latitud?: SortOrder
-    longitud?: SortOrder
     logo_url?: SortOrder
     is_activa?: SortOrder
     horario?: SortOrder
@@ -10177,35 +8571,12 @@ export namespace Prisma {
     usuario_id?: SortOrder
     nombre?: SortOrder
     direccion?: SortOrder
-    latitud?: SortOrder
-    longitud?: SortOrder
     logo_url?: SortOrder
     is_activa?: SortOrder
     horario?: SortOrder
     telefono?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
-  }
-
-  export type TiendaSumOrderByAggregateInput = {
-    latitud?: SortOrder
-    longitud?: SortOrder
-  }
-
-  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedDecimalNullableFilter<$PrismaModel>
-    _sum?: NestedDecimalNullableFilter<$PrismaModel>
-    _min?: NestedDecimalNullableFilter<$PrismaModel>
-    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -10310,55 +8681,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumEstadoMultaFilter<$PrismaModel>
     _max?: NestedEnumEstadoMultaFilter<$PrismaModel>
-  }
-
-  export type PrecioCountOrderByAggregateInput = {
-    precio_id?: SortOrder
-    producto_id?: SortOrder
-    tienda_id?: SortOrder
-    precio?: SortOrder
-    en_oferta?: SortOrder
-    precio_original?: SortOrder
-    disponible?: SortOrder
-    ultima_actualizacion?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-  }
-
-  export type PrecioAvgOrderByAggregateInput = {
-    precio?: SortOrder
-    precio_original?: SortOrder
-  }
-
-  export type PrecioMaxOrderByAggregateInput = {
-    precio_id?: SortOrder
-    producto_id?: SortOrder
-    tienda_id?: SortOrder
-    precio?: SortOrder
-    en_oferta?: SortOrder
-    precio_original?: SortOrder
-    disponible?: SortOrder
-    ultima_actualizacion?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-  }
-
-  export type PrecioMinOrderByAggregateInput = {
-    precio_id?: SortOrder
-    producto_id?: SortOrder
-    tienda_id?: SortOrder
-    precio?: SortOrder
-    en_oferta?: SortOrder
-    precio_original?: SortOrder
-    disponible?: SortOrder
-    ultima_actualizacion?: SortOrder
-    created_at?: SortOrder
-    updated_at?: SortOrder
-  }
-
-  export type PrecioSumOrderByAggregateInput = {
-    precio?: SortOrder
-    precio_original?: SortOrder
   }
 
   export type TiendaCreateNestedOneWithoutUsuarioInput = {
@@ -10574,33 +8896,11 @@ export namespace Prisma {
     connect?: MultaWhereUniqueInput | MultaWhereUniqueInput[]
   }
 
-  export type PrecioCreateNestedManyWithoutTiendaInput = {
-    create?: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput> | PrecioCreateWithoutTiendaInput[] | PrecioUncheckedCreateWithoutTiendaInput[]
-    connectOrCreate?: PrecioCreateOrConnectWithoutTiendaInput | PrecioCreateOrConnectWithoutTiendaInput[]
-    createMany?: PrecioCreateManyTiendaInputEnvelope
-    connect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-  }
-
   export type MultaUncheckedCreateNestedManyWithoutTiendaInput = {
     create?: XOR<MultaCreateWithoutTiendaInput, MultaUncheckedCreateWithoutTiendaInput> | MultaCreateWithoutTiendaInput[] | MultaUncheckedCreateWithoutTiendaInput[]
     connectOrCreate?: MultaCreateOrConnectWithoutTiendaInput | MultaCreateOrConnectWithoutTiendaInput[]
     createMany?: MultaCreateManyTiendaInputEnvelope
     connect?: MultaWhereUniqueInput | MultaWhereUniqueInput[]
-  }
-
-  export type PrecioUncheckedCreateNestedManyWithoutTiendaInput = {
-    create?: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput> | PrecioCreateWithoutTiendaInput[] | PrecioUncheckedCreateWithoutTiendaInput[]
-    connectOrCreate?: PrecioCreateOrConnectWithoutTiendaInput | PrecioCreateOrConnectWithoutTiendaInput[]
-    createMany?: PrecioCreateManyTiendaInputEnvelope
-    connect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-  }
-
-  export type NullableDecimalFieldUpdateOperationsInput = {
-    set?: Decimal | DecimalJsLike | number | string | null
-    increment?: Decimal | DecimalJsLike | number | string
-    decrement?: Decimal | DecimalJsLike | number | string
-    multiply?: Decimal | DecimalJsLike | number | string
-    divide?: Decimal | DecimalJsLike | number | string
   }
 
   export type UsuarioUpdateOneRequiredWithoutTiendaNestedInput = {
@@ -10625,20 +8925,6 @@ export namespace Prisma {
     deleteMany?: MultaScalarWhereInput | MultaScalarWhereInput[]
   }
 
-  export type PrecioUpdateManyWithoutTiendaNestedInput = {
-    create?: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput> | PrecioCreateWithoutTiendaInput[] | PrecioUncheckedCreateWithoutTiendaInput[]
-    connectOrCreate?: PrecioCreateOrConnectWithoutTiendaInput | PrecioCreateOrConnectWithoutTiendaInput[]
-    upsert?: PrecioUpsertWithWhereUniqueWithoutTiendaInput | PrecioUpsertWithWhereUniqueWithoutTiendaInput[]
-    createMany?: PrecioCreateManyTiendaInputEnvelope
-    set?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    disconnect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    delete?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    connect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    update?: PrecioUpdateWithWhereUniqueWithoutTiendaInput | PrecioUpdateWithWhereUniqueWithoutTiendaInput[]
-    updateMany?: PrecioUpdateManyWithWhereWithoutTiendaInput | PrecioUpdateManyWithWhereWithoutTiendaInput[]
-    deleteMany?: PrecioScalarWhereInput | PrecioScalarWhereInput[]
-  }
-
   export type MultaUncheckedUpdateManyWithoutTiendaNestedInput = {
     create?: XOR<MultaCreateWithoutTiendaInput, MultaUncheckedCreateWithoutTiendaInput> | MultaCreateWithoutTiendaInput[] | MultaUncheckedCreateWithoutTiendaInput[]
     connectOrCreate?: MultaCreateOrConnectWithoutTiendaInput | MultaCreateOrConnectWithoutTiendaInput[]
@@ -10651,20 +8937,6 @@ export namespace Prisma {
     update?: MultaUpdateWithWhereUniqueWithoutTiendaInput | MultaUpdateWithWhereUniqueWithoutTiendaInput[]
     updateMany?: MultaUpdateManyWithWhereWithoutTiendaInput | MultaUpdateManyWithWhereWithoutTiendaInput[]
     deleteMany?: MultaScalarWhereInput | MultaScalarWhereInput[]
-  }
-
-  export type PrecioUncheckedUpdateManyWithoutTiendaNestedInput = {
-    create?: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput> | PrecioCreateWithoutTiendaInput[] | PrecioUncheckedCreateWithoutTiendaInput[]
-    connectOrCreate?: PrecioCreateOrConnectWithoutTiendaInput | PrecioCreateOrConnectWithoutTiendaInput[]
-    upsert?: PrecioUpsertWithWhereUniqueWithoutTiendaInput | PrecioUpsertWithWhereUniqueWithoutTiendaInput[]
-    createMany?: PrecioCreateManyTiendaInputEnvelope
-    set?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    disconnect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    delete?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    connect?: PrecioWhereUniqueInput | PrecioWhereUniqueInput[]
-    update?: PrecioUpdateWithWhereUniqueWithoutTiendaInput | PrecioUpdateWithWhereUniqueWithoutTiendaInput[]
-    updateMany?: PrecioUpdateManyWithWhereWithoutTiendaInput | PrecioUpdateManyWithWhereWithoutTiendaInput[]
-    deleteMany?: PrecioScalarWhereInput | PrecioScalarWhereInput[]
   }
 
   export type TiendaCreateNestedOneWithoutMultasInput = {
@@ -10707,20 +8979,6 @@ export namespace Prisma {
     delete?: UsuarioWhereInput | boolean
     connect?: UsuarioWhereUniqueInput
     update?: XOR<XOR<UsuarioUpdateToOneWithWhereWithoutMultasInput, UsuarioUpdateWithoutMultasInput>, UsuarioUncheckedUpdateWithoutMultasInput>
-  }
-
-  export type TiendaCreateNestedOneWithoutPreciosInput = {
-    create?: XOR<TiendaCreateWithoutPreciosInput, TiendaUncheckedCreateWithoutPreciosInput>
-    connectOrCreate?: TiendaCreateOrConnectWithoutPreciosInput
-    connect?: TiendaWhereUniqueInput
-  }
-
-  export type TiendaUpdateOneRequiredWithoutPreciosNestedInput = {
-    create?: XOR<TiendaCreateWithoutPreciosInput, TiendaUncheckedCreateWithoutPreciosInput>
-    connectOrCreate?: TiendaCreateOrConnectWithoutPreciosInput
-    upsert?: TiendaUpsertWithoutPreciosInput
-    connect?: TiendaWhereUniqueInput
-    update?: XOR<XOR<TiendaUpdateToOneWithWhereWithoutPreciosInput, TiendaUpdateWithoutPreciosInput>, TiendaUncheckedUpdateWithoutPreciosInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -10910,33 +9168,6 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
-  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-  }
-
-  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
-    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
-    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
-    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedDecimalNullableFilter<$PrismaModel>
-    _sum?: NestedDecimalNullableFilter<$PrismaModel>
-    _min?: NestedDecimalNullableFilter<$PrismaModel>
-    _max?: NestedDecimalNullableFilter<$PrismaModel>
-  }
-
   export type NestedDecimalFilter<$PrismaModel = never> = {
     equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
     in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
@@ -10985,8 +9216,6 @@ export namespace Prisma {
     tienda_id?: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -10994,15 +9223,12 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     multas?: MultaCreateNestedManyWithoutTiendaInput
-    precios?: PrecioCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaUncheckedCreateWithoutUsuarioInput = {
     tienda_id?: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -11010,7 +9236,6 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     multas?: MultaUncheckedCreateNestedManyWithoutTiendaInput
-    precios?: PrecioUncheckedCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaCreateOrConnectWithoutUsuarioInput = {
@@ -11126,8 +9351,6 @@ export namespace Prisma {
     tienda_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11135,15 +9358,12 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     multas?: MultaUpdateManyWithoutTiendaNestedInput
-    precios?: PrecioUpdateManyWithoutTiendaNestedInput
   }
 
   export type TiendaUncheckedUpdateWithoutUsuarioInput = {
     tienda_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11151,7 +9371,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     multas?: MultaUncheckedUpdateManyWithoutTiendaNestedInput
-    precios?: PrecioUncheckedUpdateManyWithoutTiendaNestedInput
   }
 
   export type MultaUpsertWithWhereUniqueWithoutUsuarioInput = {
@@ -11483,40 +9702,6 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
-  export type PrecioCreateWithoutTiendaInput = {
-    precio_id?: string
-    producto_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-  }
-
-  export type PrecioUncheckedCreateWithoutTiendaInput = {
-    precio_id?: string
-    producto_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-  }
-
-  export type PrecioCreateOrConnectWithoutTiendaInput = {
-    where: PrecioWhereUniqueInput
-    create: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput>
-  }
-
-  export type PrecioCreateManyTiendaInputEnvelope = {
-    data: PrecioCreateManyTiendaInput | PrecioCreateManyTiendaInput[]
-    skipDuplicates?: boolean
-  }
-
   export type UsuarioUpsertWithoutTiendaInput = {
     update: XOR<UsuarioUpdateWithoutTiendaInput, UsuarioUncheckedUpdateWithoutTiendaInput>
     create: XOR<UsuarioCreateWithoutTiendaInput, UsuarioUncheckedCreateWithoutTiendaInput>
@@ -11576,44 +9761,10 @@ export namespace Prisma {
     data: XOR<MultaUpdateManyMutationInput, MultaUncheckedUpdateManyWithoutTiendaInput>
   }
 
-  export type PrecioUpsertWithWhereUniqueWithoutTiendaInput = {
-    where: PrecioWhereUniqueInput
-    update: XOR<PrecioUpdateWithoutTiendaInput, PrecioUncheckedUpdateWithoutTiendaInput>
-    create: XOR<PrecioCreateWithoutTiendaInput, PrecioUncheckedCreateWithoutTiendaInput>
-  }
-
-  export type PrecioUpdateWithWhereUniqueWithoutTiendaInput = {
-    where: PrecioWhereUniqueInput
-    data: XOR<PrecioUpdateWithoutTiendaInput, PrecioUncheckedUpdateWithoutTiendaInput>
-  }
-
-  export type PrecioUpdateManyWithWhereWithoutTiendaInput = {
-    where: PrecioScalarWhereInput
-    data: XOR<PrecioUpdateManyMutationInput, PrecioUncheckedUpdateManyWithoutTiendaInput>
-  }
-
-  export type PrecioScalarWhereInput = {
-    AND?: PrecioScalarWhereInput | PrecioScalarWhereInput[]
-    OR?: PrecioScalarWhereInput[]
-    NOT?: PrecioScalarWhereInput | PrecioScalarWhereInput[]
-    precio_id?: StringFilter<"Precio"> | string
-    producto_id?: StringFilter<"Precio"> | string
-    tienda_id?: StringFilter<"Precio"> | string
-    precio?: DecimalFilter<"Precio"> | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFilter<"Precio"> | boolean
-    precio_original?: DecimalNullableFilter<"Precio"> | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFilter<"Precio"> | boolean
-    ultima_actualizacion?: DateTimeFilter<"Precio"> | Date | string
-    created_at?: DateTimeFilter<"Precio"> | Date | string
-    updated_at?: DateTimeFilter<"Precio"> | Date | string
-  }
-
   export type TiendaCreateWithoutMultasInput = {
     tienda_id?: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
@@ -11621,7 +9772,6 @@ export namespace Prisma {
     created_at?: Date | string
     updated_at?: Date | string
     usuario: UsuarioCreateNestedOneWithoutTiendaInput
-    precios?: PrecioCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaUncheckedCreateWithoutMultasInput = {
@@ -11629,15 +9779,12 @@ export namespace Prisma {
     usuario_id: string
     nombre: string
     direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
     logo_url?: string | null
     is_activa?: boolean
     horario?: string | null
     telefono?: string | null
     created_at?: Date | string
     updated_at?: Date | string
-    precios?: PrecioUncheckedCreateNestedManyWithoutTiendaInput
   }
 
   export type TiendaCreateOrConnectWithoutMultasInput = {
@@ -11697,8 +9844,6 @@ export namespace Prisma {
     tienda_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
@@ -11706,7 +9851,6 @@ export namespace Prisma {
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
     usuario?: UsuarioUpdateOneRequiredWithoutTiendaNestedInput
-    precios?: PrecioUpdateManyWithoutTiendaNestedInput
   }
 
   export type TiendaUncheckedUpdateWithoutMultasInput = {
@@ -11714,15 +9858,12 @@ export namespace Prisma {
     usuario_id?: StringFieldUpdateOperationsInput | string
     nombre?: StringFieldUpdateOperationsInput | string
     direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
     logo_url?: NullableStringFieldUpdateOperationsInput | string | null
     is_activa?: BoolFieldUpdateOperationsInput | boolean
     horario?: NullableStringFieldUpdateOperationsInput | string | null
     telefono?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    precios?: PrecioUncheckedUpdateManyWithoutTiendaNestedInput
   }
 
   export type UsuarioUpsertWithoutMultasInput = {
@@ -11766,86 +9907,6 @@ export namespace Prisma {
     tienda?: TiendaUncheckedUpdateOneWithoutUsuarioNestedInput
     perfil?: PerfilUsuarioUncheckedUpdateOneWithoutUsuarioNestedInput
     sesiones?: SesionUsuarioUncheckedUpdateManyWithoutUsuarioNestedInput
-  }
-
-  export type TiendaCreateWithoutPreciosInput = {
-    tienda_id?: string
-    nombre: string
-    direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
-    logo_url?: string | null
-    is_activa?: boolean
-    horario?: string | null
-    telefono?: string | null
-    created_at?: Date | string
-    updated_at?: Date | string
-    usuario: UsuarioCreateNestedOneWithoutTiendaInput
-    multas?: MultaCreateNestedManyWithoutTiendaInput
-  }
-
-  export type TiendaUncheckedCreateWithoutPreciosInput = {
-    tienda_id?: string
-    usuario_id: string
-    nombre: string
-    direccion?: string | null
-    latitud?: Decimal | DecimalJsLike | number | string | null
-    longitud?: Decimal | DecimalJsLike | number | string | null
-    logo_url?: string | null
-    is_activa?: boolean
-    horario?: string | null
-    telefono?: string | null
-    created_at?: Date | string
-    updated_at?: Date | string
-    multas?: MultaUncheckedCreateNestedManyWithoutTiendaInput
-  }
-
-  export type TiendaCreateOrConnectWithoutPreciosInput = {
-    where: TiendaWhereUniqueInput
-    create: XOR<TiendaCreateWithoutPreciosInput, TiendaUncheckedCreateWithoutPreciosInput>
-  }
-
-  export type TiendaUpsertWithoutPreciosInput = {
-    update: XOR<TiendaUpdateWithoutPreciosInput, TiendaUncheckedUpdateWithoutPreciosInput>
-    create: XOR<TiendaCreateWithoutPreciosInput, TiendaUncheckedCreateWithoutPreciosInput>
-    where?: TiendaWhereInput
-  }
-
-  export type TiendaUpdateToOneWithWhereWithoutPreciosInput = {
-    where?: TiendaWhereInput
-    data: XOR<TiendaUpdateWithoutPreciosInput, TiendaUncheckedUpdateWithoutPreciosInput>
-  }
-
-  export type TiendaUpdateWithoutPreciosInput = {
-    tienda_id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
-    direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    is_activa?: BoolFieldUpdateOperationsInput | boolean
-    horario?: NullableStringFieldUpdateOperationsInput | string | null
-    telefono?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    usuario?: UsuarioUpdateOneRequiredWithoutTiendaNestedInput
-    multas?: MultaUpdateManyWithoutTiendaNestedInput
-  }
-
-  export type TiendaUncheckedUpdateWithoutPreciosInput = {
-    tienda_id?: StringFieldUpdateOperationsInput | string
-    usuario_id?: StringFieldUpdateOperationsInput | string
-    nombre?: StringFieldUpdateOperationsInput | string
-    direccion?: NullableStringFieldUpdateOperationsInput | string | null
-    latitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    longitud?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    logo_url?: NullableStringFieldUpdateOperationsInput | string | null
-    is_activa?: BoolFieldUpdateOperationsInput | boolean
-    horario?: NullableStringFieldUpdateOperationsInput | string | null
-    telefono?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    multas?: MultaUncheckedUpdateManyWithoutTiendaNestedInput
   }
 
   export type MultaCreateManyUsuarioInput = {
@@ -11953,18 +10014,6 @@ export namespace Prisma {
     updated_at?: Date | string
   }
 
-  export type PrecioCreateManyTiendaInput = {
-    precio_id?: string
-    producto_id: string
-    precio: Decimal | DecimalJsLike | number | string
-    en_oferta?: boolean
-    precio_original?: Decimal | DecimalJsLike | number | string | null
-    disponible?: boolean
-    ultima_actualizacion?: Date | string
-    created_at?: Date | string
-    updated_at?: Date | string
-  }
-
   export type MultaUpdateWithoutTiendaInput = {
     multa_id?: StringFieldUpdateOperationsInput | string
     fecha_emision?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12000,42 +10049,6 @@ export namespace Prisma {
     estado?: EnumEstadoMultaFieldUpdateOperationsInput | $Enums.EstadoMulta
     fecha_pago?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     evidencia_url?: NullableStringFieldUpdateOperationsInput | string | null
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioUpdateWithoutTiendaInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioUncheckedUpdateWithoutTiendaInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
-    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
-    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
-  }
-
-  export type PrecioUncheckedUpdateManyWithoutTiendaInput = {
-    precio_id?: StringFieldUpdateOperationsInput | string
-    producto_id?: StringFieldUpdateOperationsInput | string
-    precio?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
-    en_oferta?: BoolFieldUpdateOperationsInput | boolean
-    precio_original?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
-    disponible?: BoolFieldUpdateOperationsInput | boolean
-    ultima_actualizacion?: DateTimeFieldUpdateOperationsInput | Date | string
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }

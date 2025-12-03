@@ -167,7 +167,7 @@ async obtenerUsuariosInteresados(categoria) {
     return [
         {
             usuario_id: 'user_real_1',
-            email: 'paxin83966@bipochub.com', // ← PON TU EMAIL REAL AQUÍ
+            email: 'bosise8983@feralrex.com', // ← PON TU EMAIL REAL AQUÍ
             nombre: 'Tú (Pruebas)',
             notificaciones_activas: true
         },
