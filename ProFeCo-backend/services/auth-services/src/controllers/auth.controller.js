@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import { generateToken } from '../utils/jwt.js'; 
+import { generateToken } from '../../../../utils/jwt.js';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -26,19 +26,36 @@ export class AuthController {
 
             const password_hash = await bcrypt.hash(password, 12);
 
-            const usuario = await prisma.usuario.create({
-                data: { email, password_hash, nombre, tipo_usuario },
-                select: { usuario_id: true, email: true, nombre: true, tipo_usuario: true, created_at: true }
+            // Transacción: Si falla crear la tienda, no se crea el usuario
+            const result = await prisma.$transaction(async (prisma) => {
+                // 1. Crear Usuario
+                const usuario = await prisma.usuario.create({
+                    data: { email, password_hash, nombre, tipo_usuario },
+                    select: { usuario_id: true, email: true, nombre: true, tipo_usuario: true, created_at: true }
+                });
+
+                // 2. Si es TIENDA, crear perfil de Tienda automáticamente
+                if (tipo_usuario === 'TIENDA') {
+                    await prisma.tienda.create({
+                        data: {
+                            usuario_id: usuario.usuario_id,
+                            nombre: nombre, // Usamos el nombre del usuario como nombre inicial de la tienda
+                            is_activa: true
+                        }
+                    });
+                }
+                
+                return usuario;
             });
 
             const token = generateToken({
-                usuario_id: usuario.usuario_id, email: usuario.email, nombre: usuario.nombre, tipo_usuario: usuario.tipo_usuario
+                usuario_id: result.usuario_id, email: result.email, nombre: result.nombre, tipo_usuario: result.tipo_usuario
             });
 
             res.status(201).json({
                 success: true,
                 message: 'Usuario registrado exitosamente',
-                data: { usuario, token }
+                data: { usuario: result, token }
             });
 
         } catch (error) {
@@ -97,53 +114,29 @@ export class AuthController {
         }
     }
 
-    // --- 3. VERIFICAR TOKEN (Para Frontend) ---
+    // --- 3. VERIFICAR TOKEN ---
     async verifyToken(req, res) {
-        // El middleware 'authenticateToken' ya validó el token y puso los datos en req.user
         if (!req.user) {
             return res.status(401).json({ success: false, message: 'Token no proporcionado o inválido' });
         }
-        
-        res.status(200).json({
-            success: true,
-            message: 'Token válido',
-            user: req.user
-        });
+        res.status(200).json({ success: true, message: 'Token válido', user: req.user });
     }
 
-    // --- 4. OBTENER PERFIL (getProfile) ---
+    // --- 4. OBTENER PERFIL ---
     async getProfile(req, res) {
         try {
-            // req.user viene del middleware authenticateToken
             const userId = req.user?.usuario_id; 
+            if (!userId) return res.status(401).json({ success: false, message: 'Usuario no autenticado' });
 
-            if (!userId) {
-                return res.status(401).json({ success: false, message: 'Usuario no autenticado' });
-            }
-
-            // Buscamos datos frescos en la BD (excluyendo password)
             const userProfile = await prisma.usuario.findUnique({
                 where: { usuario_id: userId },
                 select: {
-                    usuario_id: true,
-                    nombre: true,
-                    email: true,
-                    tipo_usuario: true,
-                    created_at: true,
-                    last_login: true
-                    // Agrega aquí otros campos si los tienes (direccion, telefono, etc)
+                    usuario_id: true, nombre: true, email: true, tipo_usuario: true, created_at: true, last_login: true
                 }
             });
 
-            if (!userProfile) {
-                return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
-            }
-
-            res.json({
-                success: true,
-                data: userProfile
-            });
-
+            if (!userProfile) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+            res.json({ success: true, data: userProfile });
         } catch (error) {
             console.error('Error al obtener perfil:', error);
             res.status(500).json({ success: false, message: 'Error del servidor al obtener perfil' });
@@ -152,12 +145,6 @@ export class AuthController {
 
     // --- 5. LOGOUT ---
     async logout(req, res) {
-        // Como usamos JWT (Stateless), el servidor no necesita borrar nada.
-        // El cliente (Frontend) es quien debe borrar el token de su almacenamiento.
-        // Aquí solo confirmamos que la petición llegó bien.
-        res.status(200).json({
-            success: true,
-            message: 'Logout exitoso (El cliente debe eliminar el token)'
-        });
+        res.status(200).json({ success: true, message: 'Logout exitoso' });
     }
 }
