@@ -26,6 +26,13 @@ class EmailService {
     constructor() {
         console.log('📧 Inicializando servicio de email...');
 
+        console.log('🔧 Configuración SMTP:');
+        console.log('   Host:', process.env.SMTP_HOST);
+        console.log('   Port:', process.env.SMTP_PORT);
+        console.log('   User:', process.env.SMTP_USER ? 'Configurado' : 'No configurado');
+        console.log('   Pass:', process.env.SMTP_PASS ? 'Configurado' : 'No configurado');
+        console.log('   Disabled?:', this.disabled);
+
         // Solo mostrar warning en desarrollo
         if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
             if (process.env.NODE_ENV !== 'production') {
@@ -57,16 +64,16 @@ class EmailService {
             if (process.env.NODE_ENV !== 'production') {
                 console.log(`📧 [SIMULADO] ${destinatario} - ${asunto.substring(0, 30)}...`);
             }
-            return { 
-                success: true, 
+            return {
+                success: true,
                 message: 'Email simulado',
-                simulated: true 
+                simulated: true
             };
         }
 
         try {
             const fromName = process.env.SMTP_FROM_NAME || "Profeco Alertas";
-            
+
             const mailOptions = {
                 from: `"${fromName}" <${process.env.SMTP_USER}>`,
                 to: destinatario,
@@ -80,11 +87,11 @@ class EmailService {
             };
 
             const resultado = await this.transporter.sendMail(mailOptions);
-            
+
             if (process.env.NODE_ENV !== 'production') {
                 console.log(`✅ Email enviado: ${destinatario}`);
             }
-            
+
             return { success: true, messageId: resultado.messageId };
         } catch (error) {
             console.error(`❌ Error email a ${destinatario}: ${error.message}`);
@@ -95,7 +102,7 @@ class EmailService {
     async enviarPlantilla(destinatario, nombrePlantilla, variables = {}) {
         try {
             const plantilla = this.obtenerPlantilla(nombrePlantilla);
-            
+
             if (!plantilla) {
                 throw new Error(`Plantilla ${nombrePlantilla} no encontrada`);
             }
@@ -152,7 +159,7 @@ class EmailService {
                     </p>
                 `
             },
-            
+
             wishlist_producto_oferta: {
                 asunto: '🎉 ¡{{producto_nombre}} en OFERTA ESPECIAL!',
                 contenido_html: `
@@ -174,7 +181,7 @@ class EmailService {
                     </p>
                 `
             },
-            
+
             wishlist_disponibilidad: {
                 asunto: '🏪 ¡{{producto_nombre}} disponible en {{tienda_nombre}}!',
                 contenido_html: `
@@ -191,6 +198,193 @@ class EmailService {
                         <a href="{{enlace_producto}}" style="background: #17a2b8; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px;">Ver disponibilidad y precios</a>
                     </div>
                 `
+            },
+
+            // AUTH: Registro y verificación
+            auth_bienvenida_consumidor: {
+                asunto: '🎉 ¡Bienvenido a ProFeCo, {{usuario_nombre}}!',
+                contenido_html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+                    <h1 style="margin: 0; font-size: 28px;">¡Bienvenido a ProFeCo!</h1>
+                    <p style="font-size: 18px; opacity: 0.9;">Tu plataforma para comparar precios</p>
+                </div>
+                
+                <div style="padding: 30px; background: #f9f9f9; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #333;">Hola {{usuario_nombre}},</h2>
+                    
+                    <p style="color: #555; line-height: 1.6;">
+                        ¡Gracias por registrarte en ProFeCo! Tu cuenta de <strong>{{tipo_usuario}}</strong> 
+                        ha sido creada exitosamente.
+                    </p>
+                    
+                    <div style="background: white; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #4CAF50;">
+                        <h3 style="color: #333; margin-top: 0;">🎯 Comienza a explorar:</h3>
+                        <ul style="color: #555; line-height: 1.8;">
+                            <li><strong>🔍 Compara precios</strong> entre diferentes supermercados</li>
+                            <li><strong>❤️ Crea listas de deseos</strong> con tus productos favoritos</li>
+                            <li><strong>⚠️ Reporta inconsistencias</strong> en precios</li>
+                            <li><strong>⭐ Califica tiendas</strong> y ayuda a otros consumidores</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{{login_url}}" style="background: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block;">
+                            Comenzar a usar ProFeCo
+                        </a>
+                    </div>
+                    
+                    <p style="color: #777; font-size: 14px; border-top: 1px solid #eee; padding-top: 20px;">
+                        Fecha de registro: <strong>{{fecha_registro}}</strong><br>
+                        Email registrado: <strong>{{usuario_email}}</strong>
+                    </p>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #888; font-size: 12px;">
+                    <p>© 2024 ProFeCo - Protección Federal del Consumidor</p>
+                    <p>Este es un correo automático, por favor no responder.</p>
+                </div>
+            </div>
+        `
+            },
+
+            auth_bienvenida_tienda: {
+                asunto: '🏪 ¡Bienvenido a ProFeCo como Tienda, {{usuario_nombre}}!',
+                contenido_html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); padding: 30px; text-align: center; color: white; border-radius: 10px 10px 0 0;">
+                    <h1 style="margin: 0; font-size: 28px;">¡Bienvenido como Tienda!</h1>
+                    <p style="font-size: 18px; opacity: 0.9;">Tu conexión directa con los consumidores</p>
+                </div>
+                
+                <div style="padding: 30px; background: #f9f9f9; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #333;">Hola {{usuario_nombre}},</h2>
+                    
+                    <p style="color: #555; line-height: 1.6;">
+                        ¡Bienvenido a ProFeCo como <strong>Tienda registrada</strong>! 
+                        Tu establecimiento <strong>{{tienda_nombre}}</strong> ahora forma parte 
+                        de nuestra red de comparación de precios.
+                    </p>
+                    
+                    <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                        <h3 style="color: #2e7d32; margin-top: 0;">✨ Beneficios para tu tienda:</h3>
+                        <ul style="color: #555; line-height: 1.8;">
+                            <li><strong>📈 Mayor visibilidad</strong> frente a consumidores</li>
+                            <li><strong>📊 Estadísticas detalladas</strong> de búsquedas</li>
+                            <li><strong>💬 Comentarios directos</strong> de clientes</li>
+                            <li><strong>🎯 Wishlists de productos</strong> demandados</li>
+                            <li><strong>🔔 Notificaciones</strong> de productos populares</li>
+                        </ul>
+                    </div>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{{login_url}}" style="background: #f5576c; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px; display: inline-block;">
+                            Acceder al panel de tienda
+                        </a>
+                    </div>
+                    
+                    <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <p style="color: #856404; margin: 0;">
+                            <strong>📝 Próximo paso:</strong> Comienza subiendo los precios de tus productos 
+                            para aparecer en las búsquedas de los consumidores.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `
+            },
+
+            verificacion_tienda: {
+                asunto: '✅ Verifica tu cuenta de tienda en ProFeCo',
+                contenido_html: `
+      <h1>Verificación de cuenta de tienda</h1>
+      <p>Hola <strong>{{usuario_nombre}}</strong>,</p>
+      <p>Para activar tu cuenta de tienda en ProFeCo, necesitas verificar tu email.</p>
+      <p><strong>Tu tienda:</strong> {{tienda_nombre}}</p>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+        <p>🔗 <strong>Enlace de verificación:</strong></p>
+        <a href="{{verification_url}}" style="word-break: break-all;">{{verification_url}}</a>
+        <p style="color: #dc3545; margin-top: 10px;">
+          ⏰ <strong>Válido por 24 horas</strong>
+        </p>
+      </div>
+      <p>Después de verificar, podrás:</p>
+      <ul>
+        <li>📊 Subir precios y ofertas</li>
+        <li>📈 Ver reportes de clientes</li>
+        <li>🔔 Recibir wishlists de consumidores</li>
+        <li>🏪 Administrar tu perfil de tienda</li>
+      </ul>
+    `
+            },
+
+            recuperacion_password: {
+                asunto: '🔒 Restablece tu contraseña en ProFeCo',
+                contenido_html: `
+      <h1>Restablecimiento de contraseña</h1>
+      <p>Hola <strong>{{usuario_nombre}}</strong>,</p>
+      <p>Recibimos una solicitud para restablecer tu contraseña en ProFeCo.</p>
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="{{reset_url}}" style="background: #dc3545; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 16px; font-weight: bold;">
+          Restablecer contraseña
+        </a>
+      </div>
+      <div style="background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107;">
+        <p>⚠️ <strong>Importante:</strong></p>
+        <ul>
+          <li>Este enlace expira en <strong>1 hora</strong></li>
+          <li>Si no solicitaste este cambio, ignora este email</li>
+          <li>Tu contraseña actual seguirá funcionando hasta que la cambies</li>
+        </ul>
+      </div>
+      <p style="font-size: 12px; color: #666; margin-top: 20px;">
+        IP de la solicitud: {{ip_address}}<br>
+        Hora: {{timestamp}}
+      </p>
+    `
+            },
+
+            // AUTH: Seguridad
+            login_nuevo_dispositivo: {
+                asunto: '📱 Nuevo inicio de sesión en ProFeCo',
+                contenido_html: `
+      <h1>Nuevo inicio de sesión detectado</h1>
+      <p>Hola <strong>{{usuario_nombre}}</strong>,</p>
+      <p>Se detectó un nuevo inicio de sesión en tu cuenta:</p>
+      <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+        <p><strong>📅 Fecha y hora:</strong> {{timestamp}}</p>
+        <p><strong>📍 Ubicación aproximada:</strong> {{ubicacion}}</p>
+        <p><strong>🖥️ Dispositivo/Navegador:</strong> {{dispositivo}}</p>
+        <p><strong>🌐 Dirección IP:</strong> {{ip_address}}</p>
+      </div>
+      <div style="margin: 20px 0;">
+        <p>¿No reconoces esta actividad?</p>
+        <a href="{{seguridad_url}}" style="background: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Revisar actividad de la cuenta
+        </a>
+      </div>
+    `
+            },
+
+            // PROFECO
+            multa_asignada: {
+                asunto: '⚖️ Multa asignada a tu tienda - ProFeCo',
+                contenido_html: `
+      <h1>Notificación de multa</h1>
+      <p>Estimado administrador de <strong>{{tienda_nombre}}</strong>,</p>
+      <p>Se ha asignado una multa a tu establecimiento:</p>
+      <div style="background: #f8d7da; padding: 20px; border-radius: 10px;">
+        <p><strong>📋 Motivo:</strong> {{motivo}}</p>
+        <p><strong>📅 Fecha emisión:</strong> {{fecha_emision}}</p>
+        <p><strong>📄 Referencia:</strong> {{multa_id}}</p>
+      </div>
+      <div style="margin: 20px 0;">
+        <p>Para más detalles y proceder con el pago o apelación:</p>
+        <a href="{{multa_url}}" style="background: #6c757d; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+          Ver detalles de la multa
+        </a>
+      </div>
+    `
             }
         };
 
@@ -230,9 +424,9 @@ class EmailService {
         try {
             const anterior = parseFloat(precioAnterior);
             const nuevo = parseFloat(precioNuevo);
-            
+
             if (isNaN(anterior) || isNaN(nuevo) || anterior === 0) return 0;
-            
+
             return Math.round(((anterior - nuevo) / anterior) * 100);
         } catch (error) {
             return 0;
@@ -243,9 +437,9 @@ class EmailService {
         try {
             const anterior = parseFloat(precioAnterior);
             const nuevo = parseFloat(precioNuevo);
-            
+
             if (isNaN(anterior) || isNaN(nuevo)) return '0.00';
-            
+
             return (anterior - nuevo).toFixed(2);
         } catch (error) {
             return '0.00';

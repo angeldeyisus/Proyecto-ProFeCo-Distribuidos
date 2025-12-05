@@ -14,6 +14,55 @@ class NotificationOrchestrator {
         }
     }
 
+    async procesarEventoAuth(evento, datos) {
+        console.log(`🔐 Procesando evento auth: ${evento}`);
+        
+        switch(evento) {
+            case 'user.registered':
+                return await authNotificationService.enviarNotificacionRegistro(datos);
+            
+            case 'user.login.success':
+                // Enviar notificación si es nuevo dispositivo
+                if (datos.es_nuevo_dispositivo) {
+                    return await this.enviarNotificacionNuevoLogin(datos);
+                }
+                break;
+                
+            case 'password.reset.requested':
+                return await authNotificationService.enviarNotificacionRecuperacionPassword(datos.usuario, datos.resetToken);
+                
+            case 'user.verified':
+                return await this.enviarNotificacionVerificacionExitosa(datos);
+                
+            default:
+                console.log(`Evento auth no manejado: ${evento}`);
+        }
+        
+        return { success: true, message: 'Evento procesado' };
+    }
+    
+    async enviarNotificacionNuevoLogin(datosLogin) {
+        const variables = {
+            usuario_nombre: datosLogin.usuario_nombre,
+            timestamp: new Date(datosLogin.timestamp).toLocaleString('es-MX'),
+            ubicacion: await this.obtenerUbicacionPorIP(datosLogin.ip),
+            dispositivo: datosLogin.userAgent,
+            ip_address: datosLogin.ip,
+            seguridad_url: `${process.env.FRONTEND_URL}/account/security`
+        };
+        
+        return await emailService.enviarPlantilla(
+            datosLogin.email,
+            'login_nuevo_dispositivo',
+            variables
+        );
+    }
+    
+    async obtenerUbicacionPorIP(ip) {
+        // Implementar con API de geolocalización o dejar genérico
+        return 'Ubicación no disponible';
+    }
+
     async enviarNotificacionOferta(datosOferta) {
         try {
             const ofertaProcesada = {

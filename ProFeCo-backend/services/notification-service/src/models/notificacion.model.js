@@ -4,16 +4,33 @@ const notificationSchema = new mongoose.Schema({
     tipo: {
         type: String,
         required: true,
-        enum: ['email', 'push', 'sms', 'in_app']
+        enum: ['email', 'push', 'sms', 'in_app', 'sistema', 'webhook'] // ← Agregar 'sistema'
     },
+
     categoria: {
         type: String,
         required: true,
-        enum: ['oferta_producto', 'precio_bajado', 'nuevo_producto', 'alerta_wishlist', 'general']
+        enum: [
+            'oferta_producto', 'precio_bajado', 'nuevo_producto', 'alerta_wishlist', 'general',
+            'registro_usuario', 'verificacion_email', 'recuperacion_password', 'login_nuevo_dispositivo', // ← Nuevas
+            'reporte_recibido', 'multa_asignada', 'calificacion_nueva',
+            'evento_servicio', 'autenticacion' // ← Agregar estas
+        ]
     },
     usuario_id: {
         type: String,
-        required: true
+        required: true,
+        ref: 'Usuario',
+        index: true
+    },
+
+    tienda_id: {
+        type: String,
+        ref: 'Tienda'
+    },
+    producto_id: {
+        type: String,
+        ref: 'Producto'
     },
     titulo: {
         type: String,
@@ -23,8 +40,17 @@ const notificationSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    prioridad: {
+        type: String,
+        enum: ['baja', 'media', 'alta', 'critica'],
+        default: 'media'
+    },
+    expira_en: {
+        type: Date,
+        default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 días
+    },
     datos: {
-        type: mongoose.Schema.Types.Mixed 
+        type: mongoose.Schema.Types.Mixed
     },
     estado: {
         type: String,
