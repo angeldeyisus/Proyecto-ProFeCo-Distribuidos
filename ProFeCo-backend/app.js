@@ -6,8 +6,9 @@ import { PrismaClient } from '@prisma/client';
 
 // --- 1. Importación de Rutas ---
 import authRoutes from './services/auth-services/src/routes/authRoutes.js';
-import productRoutes from './services/product-service/src/routes/productRoutes.js'; 
+import productRoutes from './services/product-service/src/routes/productRoutes.js';
 import priceRoutes from './services/product-service/src/routes/priceRoutes.js';
+import notificationRoutes from './services/notification-service/src/routes/notificationRoutes.js';
 // import notificationRoutes from './src/routes/notificationRoutes.js'; // 🔕 Desactivado temporalmente
 
 // --- 2. Configuración Inicial ---
@@ -42,8 +43,8 @@ app.get('/health', async (req, res) => {
     try {
         await prisma.$queryRaw`SELECT 1`;
         pgStatus = 'Conectado ✅';
-    } catch (e) { 
-        pgStatus = `Error ❌ (${e.message})`; 
+    } catch (e) {
+        pgStatus = `Error ❌ (${e.message})`;
     }
 
     // Verificar MongoDB
@@ -59,7 +60,7 @@ app.get('/health', async (req, res) => {
             postgresql: pgStatus,
             mongodb: mongoStatus
         },
-        services_mounted: ['Auth', 'Products', 'Prices'] // 🔕 Notificaciones eliminado de la lista
+        services_mounted: ['Auth', 'Products', 'Prices', 'Notifications'] // 🔕 Notificaciones eliminado de la lista
     });
 });
 
@@ -72,15 +73,15 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/prices', priceRoutes);
 
-// Notification Service - 🔕 Desactivado
-// app.use('/api/notifications', notificationRoutes);
+// Notification Service 
+app.use('/api/notifications', notificationRoutes);
 
 
 // --- 7. Manejo de Errores Global ---
 app.use('*', (req, res) => {
-    res.status(404).json({ 
-        success: false, 
-        message: `❌ Ruta no encontrada: ${req.originalUrl}` 
+    res.status(404).json({
+        success: false,
+        message: `❌ Ruta no encontrada: ${req.originalUrl}`
     });
 });
 
@@ -98,10 +99,10 @@ app.listen(PORT, () => {
     console.log(`\n==================================================`);
     console.log(`🚀 SERVIDOR PROFECO (CORE) CORRIENDO EN PUERTO ${PORT}`);
     console.log(`==================================================`);
-    console.log(`👉 Health Check: http://localhost:${PORT}/health`);
-    console.log(`📝 Auth:         http://localhost:${PORT}/api/auth`);
-    console.log(`📦 Productos:    http://localhost:${PORT}/api/products`);
-    console.log(`🏷️  Precios:      http://localhost:${PORT}/api/prices`);
-    // console.log(`🔔 Notif:        http://localhost:${PORT}/api/notifications`);
+    console.log(`👉 Health Check:         http://localhost:${PORT}/health`);
+    console.log(`📝 Auth:                 http://localhost:${PORT}/api/auth`);
+    console.log(`📦 Productos:            http://localhost:${PORT}/api/products`);
+    console.log(`🏷️  Precios:              http://localhost:${PORT}/api/prices`);
+    console.log(`🏷️  Notificaciones:       http://localhost:${PORT}/api/notifications`);
     console.log(`==================================================\n`);
 });

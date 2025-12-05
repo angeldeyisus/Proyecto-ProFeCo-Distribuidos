@@ -1,66 +1,96 @@
 import nodemailer from 'nodemailer';
-import Handlebars from 'handlebars';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Cargar .env
+const envPaths = [
+    path.join(__dirname, '..', '..', '..', '..', 'prisma', '.env'), // desde services/notification-service/src/services/
+    path.join(__dirname, '..', '..', '..', '..', '..', 'prisma', '.env'), // desde ProFeCo-backend/services/
+    path.join(__dirname, '..', '.env'), // local
+    '.env', // directorio actual
+];
+
+for (const envPath of envPaths) {
+    if (fs.existsSync(envPath)) {
+        dotenv.config({ path: envPath });
+        break;
+    }
+}
 
 class EmailService {
     constructor() {
-        // Debug: Verificar que las variables de entorno se cargaron
-        console.log('🔍 Verificando credenciales SMTP:');
-        console.log('   SMTP_HOST:', process.env.SMTP_HOST || '❌ NO CONFIGURADO');
-        console.log('   SMTP_PORT:', process.env.SMTP_PORT || '❌ NO CONFIGURADO');
-        console.log('   SMTP_USER:', process.env.SMTP_USER ? '✅ Configurado' : '❌ NO CONFIGURADO');
-        console.log('   SMTP_PASS:', process.env.SMTP_PASS ? '✅ Configurado (oculto)' : '❌ NO CONFIGURADO');
+        console.log('📧 Inicializando servicio de email...');
 
-        // Validar que existen las credenciales necesarias
+        // Solo mostrar warning en desarrollo
         if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
-            console.error('❌ ERROR: Faltan credenciales SMTP en el archivo .env');
-            throw new Error('Configuración SMTP incompleta. Verifica tu archivo .env');
+            if (process.env.NODE_ENV !== 'production') {
+                console.warn('⚠️ SMTP no configurado. Emails serán simulados.');
+            }
+            this.disabled = true;
+            return;
         }
 
-        this.transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.gmail.com',
-            port: parseInt(process.env.SMTP_PORT) || 587,
-            secure: false,
-            auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS
+        try {
+            this.transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST || 'smtp.gmail.com',
+                port: parseInt(process.env.SMTP_PORT) || 587,
+                secure: false,
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS
+                }
+            });
+            this.disabled = false;
+        } catch (error) {
+            console.error('❌ Error configurando email:', error.message);
+            this.disabled = true;
+        }
+    }
+
+    async enviarEmail(destinatario, asunto, contenido, html = null) {
+        if (this.disabled) {
+            if (process.env.NODE_ENV !== 'production') {
+                console.log(`📧 [SIMULADO] ${destinatario} - ${asunto.substring(0, 30)}...`);
             }
-        });
+            return { 
+                success: true, 
+                message: 'Email simulado',
+                simulated: true 
+            };
+        }
 
-        console.log('✅ Transporter SMTP configurado correctamente');
+        try {
+            const fromName = process.env.SMTP_FROM_NAME || "Profeco Alertas";
+            
+            const mailOptions = {
+                from: `"${fromName}" <${process.env.SMTP_USER}>`,
+                to: destinatario,
+                subject: asunto,
+                text: contenido,
+                headers: {
+                    'X-Priority': '3',
+                    'X-Mailer': 'Profeco Notification Service'
+                },
+                ...(html && { html })
+            };
+
+            const resultado = await this.transporter.sendMail(mailOptions);
+            
+            if (process.env.NODE_ENV !== 'production') {
+                console.log(`✅ Email enviado: ${destinatario}`);
+            }
+            
+            return { success: true, messageId: resultado.messageId };
+        } catch (error) {
+            console.error(`❌ Error email a ${destinatario}: ${error.message}`);
+            return { success: false, error: error.message };
+        }
     }
-
-   async enviarEmail(destinatario, asunto, contenido, html = null) {
-    try {
-        const fromName = process.env.SMTP_FROM_NAME || "Profeco Alertas";
-        const fromEmail = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER;
-        
-        // ⚠️ IMPORTANTE: Gmail requiere que el "from" sea el mismo que SMTP_USER
-        // pero podemos usar un nombre diferente
-        const mailOptions = {
-            from: `"${fromName}" <${process.env.SMTP_USER}>`,  // ← FORZAR con SMTP_USER
-            to: destinatario,
-            subject: asunto,
-            text: contenido,
-            headers: {
-                // Headers adicionales para mejorar la presentación
-                'X-Priority': '3',
-                'X-Mailer': 'Profeco Notification Service'
-            },
-            ...(html && { html })
-        };
-
-        console.log(`📧 Configuración de envío:`);
-        console.log(`   - De: ${fromName} <${process.env.SMTP_USER}>`);
-        console.log(`   - Para: ${destinatario}`);
-        
-        const resultado = await this.transporter.sendMail(mailOptions);
-        console.log(`✅ Email enviado a: ${destinatario}`);
-        return { success: true, messageId: resultado.messageId };
-    } catch (error) {
-        console.error('❌ Error enviando email:', error);
-        return { success: false, error: error.message };
-    }
-}
 
     async enviarPlantilla(destinatario, nombrePlantilla, variables = {}) {
         try {
@@ -70,18 +100,12 @@ class EmailService {
                 throw new Error(`Plantilla ${nombrePlantilla} no encontrada`);
             }
 
-            console.log('📧 Procesando plantilla:', nombrePlantilla);
-            console.log('📦 Variables recibidas:', JSON.stringify(variables, null, 2));
-
             const asunto = this.reemplazarVariables(plantilla.asunto, variables);
             const contenido = this.reemplazarVariables(plantilla.contenido_html, variables);
 
-            console.log('✅ Asunto procesado:', asunto);
-            console.log('✅ Contenido procesado (primeros 200 chars):', contenido.substring(0, 200) + '...');
-
             return await this.enviarEmail(destinatario, asunto, contenido, contenido);
         } catch (error) {
-            console.error('❌ Error enviando plantilla:', error);
+            console.error(`❌ Error plantilla ${nombrePlantilla}: ${error.message}`);
             return { success: false, error: error.message };
         }
     }
