@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // URL base de tu servidor unificado
-const BASE_URL = 'http://localhost:3000/api';
+const BASE_URL = 'http://localhost:3004/api';
 
 const uniqueId = Date.now();
 

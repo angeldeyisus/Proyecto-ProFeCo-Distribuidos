@@ -15,7 +15,7 @@ import notificationRoutes from './services/notification-service/src/routes/notif
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3004;
 const prisma = new PrismaClient();
 
 // --- 3. Middlewares Globales ---
