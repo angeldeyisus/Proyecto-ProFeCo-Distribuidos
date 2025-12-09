@@ -1,4 +1,6 @@
 import { Router } from 'express';
+// CORRECCIÓN IMPORTANTE: Si usaste el controlador que te pasé antes (export default new PriceController),
+// la importación debe ser así (sin llaves y sin new):
 import { PriceController } from '../controllers/price.controller.js';
 import { authenticateToken } from '../../../auth-services/src/middleware/auth.js'; 
 
@@ -10,19 +12,17 @@ const priceController = new PriceController();
 // ==========================
 
 // Crear o Actualizar precio (Requiere ser TIENDA)
-// POST /api/prices/
 router.post('/', authenticateToken, (req, res) => priceController.crearOActualizarPrecio(req, res));
 
-// Obtener precio específico de un producto en una tienda
-// GET /api/prices/producto/:producto_id/tienda/:tienda_id
+// Obtener precio específico (ruta anterior)
 router.get('/producto/:producto_id/tienda/:tienda_id', (req, res) => priceController.obtenerPrecio(req, res));
 
-// Obtener todos los precios de un producto (Comparador)
-// GET /api/prices/producto/:producto_id
-router.get('/producto/:producto_id', (req, res) => priceController.obtenerPreciosPorProducto(req, res));
+// --- ESTA ES LA RUTA QUE USA EL MODAL DEL DASHBOARD ---
+// Unificamos a inglés "product" y parámetro "productId" para que coincida con el Frontend y el Controller
+router.get('/product/:productId', (req, res) => priceController.obtenerPreciosPorProducto(req, res));
+
 
 // Obtener todos los precios de una tienda
-// GET /api/prices/tienda/:tienda_id
 router.get('/tienda/:tienda_id', (req, res) => priceController.obtenerPreciosPorTienda(req, res));
 
 
@@ -59,6 +59,14 @@ router.get('/estadisticas/:producto_id', (req, res) => priceController.obtenerEs
 // POST /api/prices/buscar/rango
 router.post('/buscar/rango', (req, res) => priceController.buscarPreciosPorRango(req, res));
 
+router.post('/reportar', authenticateToken, (req, res) => priceController.crearReporte(req, res));
+
+router.post('/resenas', authenticateToken, (req, res) => priceController.crearResena(req, res));
+router.get('/resenas/tienda/:tiendaId', (req, res) => priceController.obtenerResenasTienda(req, res));
+router.get('/preferencias', authenticateToken, (req, res) => priceController.obtenerPreferencias(req, res));
+router.post('/preferencias/wishlist', authenticateToken, (req, res) => priceController.toggleWishlist(req, res));
+router.post('/preferencias/tiendas', authenticateToken, (req, res) => priceController.toggleTiendaFavorita(req, res));
+
 
 // ==========================
 // 4. ADMIN - MANTENIMIENTO
@@ -66,6 +74,6 @@ router.post('/buscar/rango', (req, res) => priceController.buscarPreciosPorRango
 
 // Limpiar ofertas vencidas (Puede ser llamado por un Cron Job o Admin)
 // POST /api/prices/admin/actualizar-ofertas-expiradas
-router.post('/admin/actualizar-ofertas-expiradas', authenticateToken, (req, res) => priceController.actualizarOfertasExpiradas(req, res));
+router.post('/admin/actualizar-ofertas-expiradas', authenticateToken, (req, res) => priceController.actualizarOfertasExpiradas(req, res))
 
 export default router;

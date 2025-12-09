@@ -230,6 +230,52 @@ async procesarLoginExitoso(datos) {
     }
 }
 
+async procesarLoginFallido(datos) {
+    try {
+      console.log(`⚠️ Login fallido reportado para: ${datos.email}`);
+      
+      // Guardar en historial de seguridad
+      await this.guardarLoginFallidoEnHistorial(datos);
+
+      return {
+        success: true,
+        email: datos.email,
+        procesado: true,
+        mensaje: 'Login fallido registrado'
+      };
+      
+    } catch (error) {
+      console.error('❌ Error procesando login fallido:', error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  async guardarLoginFallidoEnHistorial(datos) {
+    try {
+      const notificacion = new Notification({
+        tipo: 'sistema', 
+        categoria: 'seguridad', // Categoría específica para filtros
+        usuario_id: datos.usuario_id || 'sistema', // Puede ser null si el usuario no existe
+        titulo: '⚠️ Intento de inicio de sesión fallido',
+        mensaje: `Intento fallido para el email ${datos.email}`,
+        datos: {
+          email: datos.email,
+          ip_address: datos.ip || datos.ip_address || 'desconocida',
+          intentos: datos.intentos || 1,
+          timestamp: new Date()
+        },
+        estado: 'enviada', // Técnicamente se guarda como notificación de sistema
+        enviada_en: new Date()
+      });
+
+      await notificacion.save();
+      console.log('📝 Login fallido registrado en historial');
+      
+    } catch (error) {
+      console.error('❌ Error guardando login fallido en historial:', error.message);
+    }
+  }
+
 async guardarLoginEnHistorial(datos, esNuevoDispositivo) {
     try {
         const notificacion = new Notification({

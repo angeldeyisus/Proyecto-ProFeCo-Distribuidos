@@ -1,5 +1,8 @@
 import Precio from '../models/precio.model.js';
 import { PrismaClient } from '@prisma/client';
+import Reporte from '../models/reporte.model.js';
+import Resena from '../models/resena.model.js';
+import Preferencia from '../models/preferencia.model.js';
 
 const prisma = new PrismaClient();
 
@@ -87,13 +90,35 @@ export class PriceController {
     // GET /api/prices/producto/:producto_id
     async obtenerPreciosPorProducto(req, res) {
         try {
-            const { producto_id } = req.params;
-            // Ordenar por precio ascendente (el más barato primero)
-            const precios = await Precio.find({ producto_id }).sort({ precio: 1 });
-            res.json({ success: true, count: precios.length, data: precios });
-        } catch (error) {
-            res.status(500).json({ success: false, message: error.message });
-        }
+      const { productId } = req.params;
+
+      if (!productId) {
+        return res.status(400).json({ success: false, message: 'ID de producto requerido' });
+      }
+
+      console.log(`🔎 Buscando precios para producto: ${productId}`);
+
+      // Búsqueda en MongoDB
+      const precios = await Precio.find({
+        producto_id: productId, // Mongoose maneja la conversión si es ObjectId automáticamente
+        disponible: true        // Solo mostrar si la tienda dice que está disponible
+      })
+      .select('tienda_nombre precio ultima_actualizacion tienda_id') // Solo traemos lo necesario
+      .sort({ precio: 1 }); // Ordenamos: 1 es ascendente (del más barato al más caro)
+
+      res.json({
+        success: true,
+        count: precios.length,
+        data: precios
+      });
+
+    } catch (error) {
+      console.error('❌ Error obteniendo precios:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error al obtener precios: ' + error.message 
+      });
+    }
     }
 
     // GET /api/prices/tienda/:tienda_id
@@ -225,6 +250,187 @@ export class PriceController {
             res.status(500).json({ success: false, message: error.message });
         }
     }
+
+    async crearReporte(req, res) {
+    try {
+      const { 
+        tienda_id, 
+        tienda_nombre, 
+        producto_id, 
+        producto_nombre, 
+        precio_publicado, 
+        motivo, 
+        comentarios 
+      } = req.body;
+
+      // El usuario viene del token (req.user) gracias al middleware authenticateToken
+      const usuario_id = req.user.usuario_id;
+      const usuario_nombre = req.user.nombre;
+
+      if (!tienda_id || !producto_id || !motivo) {
+        return res.status(400).json({ success: false, message: 'Faltan datos obligatorios' });
+      }
+
+      const nuevoReporte = new Reporte({
+        usuario_id,
+        usuario_nombre,
+        tienda_id,
+        tienda_nombre,
+        producto_id,
+        producto_nombre,
+        precio_publicado,
+        motivo,
+        comentarios
+      });
+
+      await nuevoReporte.save();
+
+      // Opcional: Aquí podrías disparar una notificación a PROFECO o a la Tienda
+      console.log(`🚨 Nuevo reporte creado por ${usuario_nombre} contra ${tienda_nombre}`);
+
+      res.status(201).json({
+        success: true,
+        message: 'Reporte enviado exitosamente. Gracias por tu colaboración.',
+        data: nuevoReporte
+      });
+
+    } catch (error) {
+      console.error('❌ Error creando reporte:', error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // --- CREAR RESEÑA ---
+  async crearResena(req, res) {
+    try {
+      const { tienda_id, tienda_nombre, calificacion, comentario } = req.body;
+      const { usuario_id, nombre } = req.user; // Del token
+
+      if (!tienda_id || !calificacion) {
+        return res.status(400).json({ success: false, message: 'Faltan datos' });
+      }
+
+      // Upsert: Si ya existe, actualiza. Si no, crea.
+      const resena = await Resena.findOneAndUpdate(
+        { usuario_id, tienda_id },
+        { 
+          usuario_nombre: nombre,
+          tienda_nombre,
+          calificacion, 
+          comentario 
+        },
+        { new: true, upsert: true }
+      );
+
+      res.status(201).json({ success: true, message: 'Reseña guardada', data: resena });
+    } catch (error) {
+      console.error('Error creando reseña:', error);
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // --- OBTENER RESEÑAS DE UNA TIENDA ---
+  async obtenerResenasTienda(req, res) {
+    try {
+      const { tiendaId } = req.params;
+      
+      const resenas = await Resena.find({ tienda_id: tiendaId }).sort({ createdAt: -1 });
+      
+      // Calcular promedio
+      const total = resenas.length;
+      const promedio = total > 0 
+        ? resenas.reduce((acc, curr) => acc + curr.calificacion, 0) / total 
+        : 0;
+
+      res.json({ success: true, data: { resenas, promedio, total } });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // Obtener mis favoritos
+  async obtenerPreferencias(req, res) {
+    try {
+      const { usuario_id } = req.user;
+      
+      let prefs = await Preferencia.findOne({ usuario_id });
+      
+      if (!prefs) {
+        // Si no tiene preferencias, devolvemos arrays vacíos
+        return res.json({ success: true, data: { wishlist: [], tiendas_favoritas: [] } });
+      }
+
+      res.json({ success: true, data: prefs });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // Toggle Wishlist (Agregar/Quitar Producto)
+  async toggleWishlist(req, res) {
+    try {
+      const { usuario_id } = req.user;
+      const { producto_id } = req.body;
+
+      if (!producto_id) return res.status(400).json({ message: 'Producto ID requerido' });
+
+      // Buscamos o creamos el documento de preferencias
+      let prefs = await Preferencia.findOne({ usuario_id });
+      if (!prefs) {
+        prefs = new Preferencia({ usuario_id, wishlist: [], tiendas_favoritas: [] });
+      }
+
+      // Verificamos si ya está en la lista
+      const index = prefs.wishlist.indexOf(producto_id);
+      let accion = '';
+
+      if (index === -1) {
+        prefs.wishlist.push(producto_id); // Agregar
+        accion = 'agregado';
+      } else {
+        prefs.wishlist.splice(index, 1); // Quitar
+        accion = 'eliminado';
+      }
+
+      await prefs.save();
+      res.json({ success: true, message: `Producto ${accion} de la lista`, wishlist: prefs.wishlist });
+
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  // Toggle Tienda Favorita (Agregar/Quitar Tienda)
+  async toggleTiendaFavorita(req, res) {
+    try {
+      const { usuario_id } = req.user;
+      const { tienda_id } = req.body;
+
+      if (!tienda_id) return res.status(400).json({ message: 'Tienda ID requerido' });
+
+      let prefs = await Preferencia.findOne({ usuario_id });
+      if (!prefs) {
+        prefs = new Preferencia({ usuario_id, wishlist: [], tiendas_favoritas: [] });
+      }
+
+      const index = prefs.tiendas_favoritas.indexOf(tienda_id);
+      let accion = '';
+
+      if (index === -1) {
+        prefs.tiendas_favoritas.push(tienda_id);
+        accion = 'agregada';
+      } else {
+        prefs.tiendas_favoritas.splice(index, 1);
+        accion = 'eliminada';
+      }
+
+      await prefs.save();
+      res.json({ success: true, message: `Tienda ${accion} de favoritos`, tiendas_favoritas: prefs.tiendas_favoritas });
+
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
 
     // ==========================================
     // 4. ADMIN - MANTENIMIENTO

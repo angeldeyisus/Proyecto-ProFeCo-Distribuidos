@@ -14,7 +14,7 @@ const notificationSchema = new mongoose.Schema({
             'oferta_producto', 'precio_bajado', 'nuevo_producto', 'alerta_wishlist', 'general',
             'registro_usuario', 'verificacion_email', 'recuperacion_password', 'login_nuevo_dispositivo', // ← Nuevas
             'reporte_recibido', 'multa_asignada', 'calificacion_nueva',
-            'evento_servicio', 'autenticacion' // ← Agregar estas
+            'evento_servicio', 'autenticacion', 'seguridad' // ← Agregar estas
         ]
     },
     usuario_id: {
