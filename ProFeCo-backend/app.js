@@ -9,7 +9,8 @@ import authRoutes from './services/auth-services/src/routes/authRoutes.js';
 import productRoutes from './services/product-service/src/routes/productRoutes.js';
 import priceRoutes from './services/product-service/src/routes/priceRoutes.js';
 import notificationRoutes from './services/notification-service/src/routes/notificationRoutes.js';
-// import notificationRoutes from './src/routes/notificationRoutes.js'; // 🔕 Desactivado temporalmente
+// 👇 Importamos las rutas del nuevo servicio PROFECO
+import profecoRoutes from './services/profeco-service/src/routes/profecoRoutes.js';
 
 // --- 2. Configuración Inicial ---
 dotenv.config();
@@ -25,11 +26,11 @@ app.use(express.urlencoded({ extended: true }));
 
 // --- 4. Conexión a Bases de Datos ---
 
-// A. Conexión a MongoDB (Solo Inventario y Precios)
+// A. Conexión a MongoDB (Inventario, Precios y PROFECO)
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/profeco-main-db';
 
 mongoose.connect(MONGO_URI)
-    .then(() => console.log('🍃 MongoDB Conectado (Inventario y Precios)'))
+    .then(() => console.log('🍃 MongoDB Conectado (Inventario, Precios y Multas)'))
     .catch((err) => {
         console.error('❌ Error fatal conectando a MongoDB:', err);
     });
@@ -54,13 +55,14 @@ app.get('/health', async (req, res) => {
 
     res.json({
         status: 'Sistema ProFeCo Activo 🚀',
-        mode: 'Core Services Only',
+        mode: 'Microservices Integrated',
         timestamp: new Date().toISOString(),
         databases: {
             postgresql: pgStatus,
             mongodb: mongoStatus
         },
-        services_mounted: ['Auth', 'Products', 'Prices', 'Notifications'] // 🔕 Notificaciones eliminado de la lista
+        // Agregamos 'Profeco' a la lista de servicios activos
+        services_mounted: ['Auth', 'Products', 'Prices', 'Notifications', 'Profeco'] 
     });
 });
 
@@ -75,6 +77,9 @@ app.use('/api/prices', priceRoutes);
 
 // Notification Service 
 app.use('/api/notifications', notificationRoutes);
+
+// 👇 Profeco Service (Nuevo)
+app.use('/api/profeco', profecoRoutes);
 
 
 // --- 7. Manejo de Errores Global ---
@@ -97,12 +102,13 @@ app.use((error, req, res, next) => {
 // --- 8. Iniciar el Servidor ---
 app.listen(PORT, () => {
     console.log(`\n==================================================`);
-    console.log(`🚀 SERVIDOR PROFECO (CORE) CORRIENDO EN PUERTO ${PORT}`);
+    console.log(`🚀 SERVIDOR PROFECO CORRIENDO EN PUERTO ${PORT}`);
     console.log(`==================================================`);
-    console.log(`👉 Health Check:         http://localhost:${PORT}/health`);
-    console.log(`📝 Auth:                 http://localhost:${PORT}/api/auth`);
-    console.log(`📦 Productos:            http://localhost:${PORT}/api/products`);
-    console.log(`🏷️  Precios:              http://localhost:${PORT}/api/prices`);
-    console.log(`🏷️  Notificaciones:       http://localhost:${PORT}/api/notifications`);
+    console.log(`👉 Health Check:        http://localhost:${PORT}/health`);
+    console.log(`📝 Auth:                http://localhost:${PORT}/api/auth`);
+    console.log(`📦 Productos:           http://localhost:${PORT}/api/products`);
+    console.log(`🏷️  Precios:             http://localhost:${PORT}/api/prices`);
+    console.log(`🔔 Notificaciones:      http://localhost:${PORT}/api/notifications`);
+    console.log(`⚖️  Profeco (Multas):    http://localhost:${PORT}/api/profeco`); // <--- Nueva ruta
     console.log(`==================================================\n`);
 });

@@ -1,40 +1,47 @@
-import * as multaRepository from "../multa.repository.js";
+import * as multaRepository from "../repositories/multa.repository.js"
+import * as reporteRepository from "../repositories/reporte.repository.js"
 
 export class MultaService {
 
-    async crearMulta(data) {
-        const { tienda_id, motivo, monto } = data;
+    // --- LÓGICA DEL TABLERO ---
+    async obtenerTableroProfeco() {
+        return await reporteRepository.obtenerInfractoresAgrupados();
+    }
 
-        if (!tienda_id) {
-            throw new Error("El ID de la tienda es obligatorio para registrar una multa.");
-        }
+    // --- LÓGICA DE IMPONER MULTA ---
+    async imponerMulta(data) {
+        const { tienda_id, tienda_nombre, motivo, monto, agente_id, agente_nombre } = data;
 
-        if (!motivo || motivo.trim().length < 5) {
-            throw new Error("El motivo de la multa debe tener al menos 5 caracteres.");
-        }
+        // 1. Validaciones
+        if (!tienda_id) throw new Error("ID de tienda requerido.");
+        if (!monto || monto <= 0) throw new Error("Monto inválido.");
 
-        if (monto == null || monto <= 0) {
-            throw new Error("El monto de la multa debe ser un número mayor a 0.");
-        }
+        // 2. Contar cuántas quejas estamos castigando
+        const cantidadReportes = await reporteRepository.contarPendientesPorTienda(tienda_id);
 
-        const nuevaMulta = await multaRepository.crearMulta(data);
+        // 3. Crear la Multa
+        const datosMulta = {
+            tienda_id,
+            tienda_nombre,
+            agente_id,
+            agente_nombre,
+            monto,
+            motivo,
+            cantidad_reportes_asociados: cantidadReportes
+        };
+
+        const nuevaMulta = await multaRepository.crearMulta(datosMulta);
+
+        // 4. Cerrar los reportes automáticamente ("Justicia aplicada")
+        await reporteRepository.resolverReportesPorTienda(tienda_id, nuevaMulta._id);
+
         return nuevaMulta;
     }
 
+    // (Tus métodos anteriores pueden quedarse si los usas para historial)
     async obtenerMultasDeTienda(tiendaId) {
-        if (!tiendaId) {
-            throw new Error("Se requiere el ID de la tienda para obtener sus multas.");
-        }
-
+        // ... tu código existente ...
         const multas = await multaRepository.obtenerMultasDeTienda(tiendaId);
-
-        const totalMonto = multas.reduce((acc, m) => acc + (m.monto || 0), 0);
-
-        return {
-            tienda_id: tiendaId,
-            total_multas: multas.length,
-            monto_acumulado: totalMonto,
-            multas
-        };
+        return multas;
     }
 }

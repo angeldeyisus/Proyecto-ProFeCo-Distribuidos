@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-// Agregué nuevos iconos para los campos de tienda
 import { 
   UserPlus, Mail, Lock, User, Building2, ArrowRight, 
   MapPin, Phone, Clock, Store, Upload 
@@ -12,25 +11,22 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   
-  // Agregamos los campos de tienda al estado inicial
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
     password: '',
     tipo_usuario: 'CONSUMIDOR',
-    // Campos exclusivos de tienda
     nombre_tienda: '',
     direccion: '',
     telefono: '',
     horario: '',
-    logo: null // Aquí guardaremos el archivo
+    logo: null 
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Nueva función para manejar la subida del logo
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFormData({ ...formData, logo: e.target.files[0] });
@@ -42,17 +38,13 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // IMPORTANTE: Para enviar archivos (logo), debemos usar FormData
-      // ya no podemos enviar el objeto JSON directo.
       const dataToSend = new FormData();
       
-      // Datos comunes
       dataToSend.append('nombre', formData.nombre);
       dataToSend.append('email', formData.email);
       dataToSend.append('password', formData.password);
       dataToSend.append('tipo_usuario', formData.tipo_usuario);
 
-      // Si es tienda, agregamos los datos extra
       if (formData.tipo_usuario === 'TIENDA') {
         dataToSend.append('nombre_tienda', formData.nombre_tienda);
         dataToSend.append('direccion', formData.direccion);
@@ -64,7 +56,6 @@ export default function RegisterPage() {
         }
       }
 
-      // Al usar FormData, axios configura automáticamente el header 'Content-Type': 'multipart/form-data'
       await api.post('/auth/register', dataToSend);
       
       toast.success('¡Registro exitoso! Ahora puedes iniciar sesión.');
@@ -92,6 +83,8 @@ export default function RegisterPage() {
             <p className="text-lg text-gray-200 leading-relaxed">
               {formData.tipo_usuario === 'TIENDA' 
                 ? "Registra tu comercio, gestiona tu inventario y llega a más consumidores."
+                : formData.tipo_usuario === 'PROFECO'
+                ? "Panel administrativo para agentes oficiales de la Procuraduría."
                 : "Crea tu cuenta para reportar precios y encontrar las mejores ofertas."}
             </p>
           </div>
@@ -104,7 +97,7 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Selector de Rol - Lo moví al principio para definir el flujo */}
+            {/* Selector de Rol */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Building2 className="h-5 w-5 text-gray-400" />
@@ -117,11 +110,12 @@ export default function RegisterPage() {
               >
                 <option value="CONSUMIDOR">Consumidor</option>
                 <option value="TIENDA">Dueño de Tienda</option>
-                {/* <option value="PROFECO">Agente Profeco</option> */}
+                {/* 👇 AQUI ESTABA COMENTADO, YA LO HABILITÉ */}
+                <option value="PROFECO">Agente Profeco</option>
               </select>
             </div>
 
-            {/* Datos Básicos (Siempre visibles) */}
+            {/* Datos Básicos */}
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <User className="h-5 w-5 text-gray-400" />
@@ -131,7 +125,7 @@ export default function RegisterPage() {
                 name="nombre"
                 required
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-profeco-500 outline-none"
-                placeholder="Nombre completo del usuario"
+                placeholder="Nombre completo"
                 value={formData.nombre}
                 onChange={handleChange}
               />
@@ -167,12 +161,11 @@ export default function RegisterPage() {
               />
             </div>
 
-            {/* --- SECCIÓN CONDICIONAL: DATOS DE LA TIENDA --- */}
+            {/* Campos Tienda */}
             {formData.tipo_usuario === 'TIENDA' && (
               <div className="space-y-4 pt-4 border-t border-gray-100 animate-in fade-in slide-in-from-top-4 duration-300">
                 <h3 className="text-sm font-semibold text-profeco-600 uppercase tracking-wider">Datos del Establecimiento</h3>
                 
-                {/* Nombre de la Tienda */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Store className="h-5 w-5 text-gray-400" />
@@ -188,7 +181,6 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                {/* Dirección */}
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <MapPin className="h-5 w-5 text-gray-400" />
@@ -204,7 +196,6 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                {/* Teléfono y Horario (Grid de 2 columnas) */}
                 <div className="grid grid-cols-2 gap-4">
                     <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -237,7 +228,6 @@ export default function RegisterPage() {
                     </div>
                 </div>
 
-                {/* Input de Logo (Archivo) */}
                 <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:bg-gray-50 transition-colors">
                     <input
                         type="file"
@@ -256,7 +246,6 @@ export default function RegisterPage() {
                 </div>
               </div>
             )}
-            {/* --- FIN SECCIÓN CONDICIONAL --- */}
 
             <button
               type="submit"
