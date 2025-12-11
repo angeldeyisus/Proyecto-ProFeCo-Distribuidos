@@ -2,7 +2,7 @@ import { Router } from 'express';
 // CORRECCIÓN IMPORTANTE: Si usaste el controlador que te pasé antes (export default new PriceController),
 // la importación debe ser así (sin llaves y sin new):
 import { PriceController } from '../controllers/price.controller.js';
-import { authenticateToken } from '../../../auth-services/src/middleware/auth.js'; 
+import { authenticateToken } from '../../../auth-services/src/middleware/auth.js';
 
 const router = Router();
 const priceController = new PriceController();
@@ -54,6 +54,7 @@ router.get('/resenas/tienda/:tiendaId', (req, res) => priceController.obtenerRes
 router.get('/preferencias', authenticateToken, (req, res) => priceController.obtenerPreferencias(req, res));
 router.post('/preferencias/wishlist', authenticateToken, (req, res) => priceController.toggleWishlist(req, res));
 router.post('/preferencias/tiendas', authenticateToken, (req, res) => priceController.toggleTiendaFavorita(req, res));
+router.get('/wishlist-stats/:producto_id', authenticateToken, (req, res) => priceController.obtenerEstadisticasWishlist(req, res));
 
 
 // ==========================
