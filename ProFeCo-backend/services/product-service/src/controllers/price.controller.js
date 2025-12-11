@@ -595,6 +595,17 @@ export class PriceController {
   // 4. ADMIN - MANTENIMIENTO
   // ==========================================
 
+  // GET /api/prices/reportes/producto/:producto_id
+  async obtenerReportesProducto(req, res) {
+    try {
+      const { producto_id } = req.params;
+      const reportes = await Reporte.find({ producto_id }).sort({ createdAt: -1 });
+      res.json({ success: true, data: reportes });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
   // POST /api/prices/admin/actualizar-ofertas-expiradas
   async actualizarOfertasExpiradas(req, res) {
     try {

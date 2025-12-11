@@ -49,6 +49,8 @@ export default function Dashboard() {
     const [showStoreReviewsModal, setShowStoreReviewsModal] = useState(false);
     const [wishlistStats, setWishlistStats] = useState(null);
     const [showWishlistStatsModal, setShowWishlistStatsModal] = useState(false);
+    const [storeReports, setStoreReports] = useState([]);
+    const [showStoreReportsModal, setShowStoreReportsModal] = useState(false);
 
     // --- ESTADOS PROFECO ⚖️ ---
     const [infractores, setInfractores] = useState([]);
@@ -247,6 +249,17 @@ export default function Dashboard() {
         } catch (error) { toast.error("Error cargando estadísticas"); }
     };
 
+    const handleViewReports = async (productId) => {
+        try {
+            const response = await api.get(`/prices/reportes/producto/${productId}`);
+            if (response.data.success) {
+                setStoreReports(response.data.data);
+                setShowStoreReportsModal(true);
+            }
+        } catch (error) { toast.error("Error cargando reportes"); }
+    };
+
+
     // Filtros
     const filteredProducts = products.filter(product => {
         const matchesSearch = product.nombre.toLowerCase().includes(searchTerm.toLowerCase());
@@ -414,6 +427,43 @@ export default function Dashboard() {
         );
     };
 
+    const renderStoreReportsModal = () => {
+        if (!showStoreReportsModal) return null;
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-in fade-in">
+                <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative max-h-[80vh] flex flex-col">
+                    <button onClick={() => setShowStoreReportsModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><X size={24} /></button>
+                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <AlertTriangle className="text-purple-500" /> Reportes de Producto
+                    </h3>
+
+                    <div className="overflow-y-auto flex-1 space-y-4">
+                        {storeReports.length === 0 ? (
+                            <p className="text-gray-500 text-center py-8">No hay reportes para este producto.</p>
+                        ) : (
+                            storeReports.map((report) => (
+                                <div key={report._id} className="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                    <div className="flex justify-between items-start mb-2">
+                                        <span className="font-bold text-gray-700">{report.usuario_nombre || 'Usuario'}</span>
+                                        <span className={`text-xs font-bold px-2 py-1 rounded-full ${report.estado === 'PENDIENTE' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-200 text-gray-600'}`}>
+                                            {report.estado}
+                                        </span>
+                                    </div>
+                                    <p className="text-gray-800 font-bold text-sm mb-1">{report.motivo}</p>
+                                    <p className="text-gray-600 text-sm italic">"{report.comentarios}"</p>
+                                    <div className="mt-2 flex justify-between items-center text-xs text-gray-400">
+                                        <span>Precio Reportado: ${report.precio_publicado}</span>
+                                        <span>{new Date(report.createdAt).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
     const renderWishlistStatsModal = () => {
         if (!showWishlistStatsModal || !wishlistStats) return null;
         return (
@@ -516,6 +566,9 @@ export default function Dashboard() {
                                                                 <Heart size={14} /> Wishlist
                                                             </button>
                                                         </div>
+                                                        <button onClick={() => handleViewReports(product._id)} className="w-full mt-2 bg-purple-50 text-purple-600 border border-purple-200 text-xs font-bold py-2 rounded-lg hover:bg-purple-100 flex justify-center gap-1 items-center">
+                                                            <AlertTriangle size={14} /> Ver Reportes
+                                                        </button>
                                                     </div>
                                                 ) : (<button onClick={() => handleViewPrices(product)} className="w-full bg-white border border-profeco-200 text-profeco-600 hover:bg-profeco-50 font-bold py-2 rounded-lg flex items-center justify-center gap-2 text-sm"><Eye size={16} /> Ver Precios</button>)}
                                             </div>
@@ -532,6 +585,7 @@ export default function Dashboard() {
             {renderOfferModal()}
             {renderMultaModal()}
             {renderStoreReviewsModal()}
+            {renderStoreReportsModal()}
             {renderWishlistStatsModal()}
         </div>
     );
