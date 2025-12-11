@@ -83,13 +83,18 @@ export default function Dashboard() {
 
   const fetchMyPrices = async () => {
     try {
-       const response = await api.get(`/prices/tienda/${user.usuario_id}`);
+       // CAMBIO: Ahora llamamos a la ruta inteligente que no necesita ID en la URL
+       const response = await api.get('/prices/mis-precios');
+       
        if (response.data.success) {
          const map = {};
          response.data.data.forEach(p => map[p.producto_id] = p);
          setMyPrices(map);
+         console.log("✅ Precios cargados correctamente:", Object.keys(map).length);
        }
-    } catch (error) {}
+    } catch (error) { 
+        console.error("Error cargando mis precios", error); 
+    }
   };
 
   const fetchPreferences = async () => {
@@ -136,9 +141,28 @@ export default function Dashboard() {
   const handleRemoveOffer = async () => {
       if (!offerItem) return;
       try {
-          await api.delete(`/prices/ofertas/producto/${offerItem._id}/tienda/${user.usuario_id}`);
-          toast.success('Oferta eliminada'); setOfferItem(null); fetchMyPrices();
-      } catch (error) { toast.error('Error eliminar oferta'); }
+          // ❌ ANTES (Incorrecto):
+          // await api.delete(`/prices/ofertas/producto/${offerItem._id}/tienda/${user.usuario_id}`);
+
+          // ✅ AHORA (Correcto):
+          // La ruta ya no pide tienda_id porque lo saca del Token
+          await api.delete(`/prices/ofertas/producto/${offerItem._id}`);
+          
+          toast.success('Oferta eliminada. Precio restaurado.');
+          setOfferItem(null);
+          
+          // Si estás en ManagePrices.jsx usa fetchMyPrices(), si es Dashboard.jsx usa la que corresponda
+          if (typeof fetchMyPrices === 'function') {
+             fetchMyPrices();
+          } else {
+             // Fallback por si acaso
+             window.location.reload(); 
+          }
+          
+      } catch (error) {
+          console.error(error);
+          toast.error('Error al eliminar oferta');
+      }
   };
   const handleViewPrices = async (product) => {
     setSelectedProduct(product); setShowModal(true); setLoadingPrices(true); setReportingItem(null); setRatingItem(null);

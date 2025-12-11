@@ -10,7 +10,7 @@ const precioSchema = new mongoose.Schema({
         trim: true
     },
     tienda_id: {
-        type: String, // UUID de referencia a PostgreSQL
+        type: String, // ID de referencia a PostgreSQL
         required: true
     },
     tienda_nombre: {
@@ -23,6 +23,7 @@ const precioSchema = new mongoose.Schema({
         min: 0
     },
 
+    // --- SECCIÓN DE OFERTAS ---
     en_oferta: {
         type: Boolean,
         default: false
@@ -35,10 +36,10 @@ const precioSchema = new mongoose.Schema({
         type: Number,
         min: 0
     },
+    // 🔥 CORRECCIÓN AQUÍ: Eliminamos el enum para permitir "10%", "20%", etc.
     tipo_descuento: {
         type: String,
-        enum: ['porcentaje', 'monto_fijo'],
-        default: 'porcentaje'
+        required: false
     },
     valor_descuento: {
         type: Number,
@@ -46,13 +47,14 @@ const precioSchema = new mongoose.Schema({
     },
     vigencia_oferta: {
         inicio: Date,
-        fin: Date
+        fin: Date // En tu controlador usas esto para saber si expiró
     },
     condiciones_oferta: {
         compra_minima: Number,
         limite_por_cliente: Number,
         exclusivo_membresia: Boolean
     },
+    
     // Historial de cambios de precio
     historial: [{
         precio: Number,
@@ -84,29 +86,24 @@ precioSchema.index({ tienda_id: 1 });
 precioSchema.index({ precio: 1 });
 precioSchema.index({ en_oferta: 1 });
 
-// --- CORRECCIÓN DEFINITIVA DEL HOOK ---
-// Usamos async function SIN el parámetro 'next'.
-// Mongoose esperará a que esta función termine automáticamente.
+// Hook pre-save para guardar historial
 precioSchema.pre('save', async function() {
-    // 'this' se refiere al documento que se está guardando
     if (this.isModified('precio')) {
         if (!this.historial) {
             this.historial = [];
         }
         
-        // Agregamos el cambio actual al historial
         this.historial.push({
             precio: this.precio,
             en_oferta: this.en_oferta,
             fuente: this.fuente || 'sistema'
         });
 
-        // Mantenemos solo los últimos 50 registros para no saturar la BD
+        // Limitar historial a 50 registros
         if (this.historial.length > 50) {
             this.historial = this.historial.slice(-50);
         }
     }
-    // No hace falta llamar a next(), simplemente terminamos la función.
 });
 
 export default mongoose.model("Precio", precioSchema);

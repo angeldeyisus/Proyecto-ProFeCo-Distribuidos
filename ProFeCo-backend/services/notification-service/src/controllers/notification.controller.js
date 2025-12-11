@@ -57,6 +57,12 @@ class NotificationController {
           resultado = await this.procesarReporteTienda(datos);
           break;
 
+          // 🔥 NUEVO CASO
+        case 'producto_en_oferta':
+          // Llamamos al orquestador que ya tienes listo
+          resultado = await notificationOrchestrator.enviarNotificacionWishlist('producto_en_oferta', datos);
+          break;
+
         case 'profeco.fine.issued':
           resultado = await this.procesarMultaProfeco(datos);
           break;
@@ -156,7 +162,7 @@ async enviarEmailBienvenida(datos) {
             usuario_email: datos.email,
             tipo_usuario: datos.tipo_usuario === 'CONSUMIDOR' ? 'Consumidor' : 'Tienda',
             fecha_registro: new Date().toLocaleDateString('es-MX'),
-            login_url: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/login`
+            login_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`
         };
         
         let plantilla;

@@ -33,7 +33,7 @@ class AuthNotificationService {
             usuario_nombre: usuarioData.nombre,
             tipo_usuario: 'Consumidor',
             fecha_registro: new Date().toLocaleDateString('es-MX'),
-            login_url: `${process.env.FRONTEND_URL || 'http://localhost:4200'}/login`
+            login_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login`
         };
         
         return await emailService.enviarPlantilla(

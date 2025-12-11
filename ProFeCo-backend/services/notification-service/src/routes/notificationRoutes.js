@@ -5,6 +5,37 @@ import authNotificationService from '../services/authNotifications.service.js';
 const router = express.Router();
 const notificationController = new NotificationController();
 
+// 👇 --- AGREGA ESTA RUTA NUEVA ---
+// Esta es la ruta que recibe el evento 'producto_en_oferta' desde PriceController
+router.post('/', async (req, res) => {
+    try {
+        const { evento, datos } = req.body;
+        console.log(`📨 Evento recibido en raíz: ${evento}`);
+
+        let resultado;
+
+        if (evento === 'producto_en_oferta') {
+            // Delegar al controlador o al orquestador
+            // Opción A: Usar el método que ya tienes en el controller
+            resultado = await notificationController.recibirEventoServicio(req, res);
+        } else {
+            console.log(`⚠️ Evento no manejado en raíz: ${evento}`);
+            res.status(400).json({ success: false, message: 'Evento no soportado en raíz' });
+        }
+        
+        // Si el controlador no responde (porque lo llamamos directamente), respondemos aquí
+        if (!res.headersSent) {
+             res.json({ success: true, message: 'Evento procesado', resultado });
+        }
+
+    } catch (error) {
+        console.error('Error en ruta raíz:', error);
+        if (!res.headersSent) res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+router.post('/', notificationController.recibirEventoServicio.bind(notificationController));
+
 // =====================
 // MIDDLEWARE DE AUTENTICACIÓN ENTRE SERVICIOS
 // =====================

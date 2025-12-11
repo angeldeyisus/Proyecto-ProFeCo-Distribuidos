@@ -406,8 +406,6 @@ class EmailService {
             ...variables
         };
 
-        console.log('🔍 Variables para reemplazo:', safeVariables);
-
         // Reemplazo simple y seguro
         return texto.replace(/\{\{(\w+)\}\}/g, (match, key) => {
             const value = safeVariables[key];

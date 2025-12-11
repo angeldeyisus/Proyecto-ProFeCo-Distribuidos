@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 
 const preferenciaSchema = new mongoose.Schema({
   usuario_id: { type: String, required: true, unique: true },
+
+  email: { type: String, required: true },
   
   // Lista de IDs de productos que el usuario quiere comprar
   wishlist: [{ 

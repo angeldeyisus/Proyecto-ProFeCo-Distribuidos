@@ -1,5 +1,6 @@
 import emailService from './email.service.js';
 import NotificationPreference from '../models/notificacionPreferencia.model.js';
+import Preferencia from '../models/preferencia.model.js';
 
 class WishlistService {
     
@@ -185,28 +186,37 @@ class WishlistService {
         }
     }
     
-    // TEMPORAL: Mock - después se integrará con Customer-Service
+    // 🔥 MÉTODO REAL CON MONGOOSE
     async obtenerUsuariosConProductoEnWishlist(producto_id) {
-        // Simular delay de base de datos
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        return [
-            {
-                usuario_id: 'user1',
-                email: 'usuario1@ejemplo.com',
-                nombre: 'Ana García'
-            },
-            {
-                usuario_id: 'user3',
-                email: 'usuario3@ejemplo.com', 
-                nombre: 'Carlos López'
-            },
-            {
-                usuario_id: 'user5', 
-                email: 'usuario5@ejemplo.com',
-                nombre: 'María Rodríguez'
+        try {
+            console.log(`🔍 Buscando usuarios interesados en el producto: ${producto_id}`);
+
+            // 1. Buscamos en la BD real
+            // Filtramos quienes tengan el producto en su array 'wishlist'
+            const preferencias = await Preferencia.find({ 
+                wishlist: producto_id 
+            }).select('usuario_id email'); // Solo necesitamos ID y Email
+
+            if (preferencias.length === 0) {
+                console.log("⚠️ Nadie tiene este producto en su wishlist.");
+                return [];
             }
-        ];
+
+            // 2. Mapeamos los resultados al formato que espera el sistema
+            // Ya no hay mocks, esto es información real de la BD
+            const usuariosReales = preferencias.map(pref => ({
+                usuario_id: pref.usuario_id,
+                email: pref.email, // ¡Aquí está el email real!
+                nombre: 'Usuario'  // El nombre es opcional para la notificación, o puedes guardarlo también
+            }));
+
+            console.log(`✅ Se encontraron ${usuariosReales.length} interesados reales.`);
+            return usuariosReales;
+
+        } catch (error) {
+            console.error('❌ Error buscando en wishlist:', error);
+            return [];
+        }
     }
 }
 

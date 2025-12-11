@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import Precio from '../models/precio.model.js';
 import { PrismaClient } from '@prisma/client';
 import Reporte from '../models/reporte.model.js';
@@ -38,6 +40,15 @@ export class PriceController {
                 ultima_actualizacion: new Date()
             };
 
+            // --- CONSOLE LOG DESTACADO ---
+            console.log('\x1b[36m%s\x1b[0m', '--------------------------------------------------'); // Cian
+            console.log('\x1b[33m%s\x1b[0m', `🏷️  INTENTO DE ACTUALIZACIÓN DE PRECIO`); // Amarillo
+            console.log(`🏪 Tienda: ${tienda.nombre} (ID: ${tienda.tienda_id})`);
+            console.log(`📦 Producto ID: ${producto_id}`);
+            console.log(`💰 Precio Recibido: ${precio}`);
+            console.log('\x1b[36m%s\x1b[0m', '--------------------------------------------------');
+            // -----------------------------
+
             // Lógica de Ofertas integrada
             if (en_oferta) {
                 if (!precio_promocional || precio_promocional >= precio) {
@@ -60,17 +71,21 @@ export class PriceController {
             let precioDoc = await Precio.findOne({ producto_id, tienda_id: tienda.tienda_id });
 
             if (precioDoc) {
+                console.log(`🔄 Actualizando documento existente...`);
                 precioDoc.set(datosActualizacion);
-                await precioDoc.save();
+                const resultado = await precioDoc.save();
+                console.log(`✅ Precio actualizado en MongoDB: ${resultado.precio}`);
                 return res.json({ success: true, message: 'Precio actualizado', data: precioDoc });
             } else {
+                console.log(`✨ Creando nuevo documento de precio...`);
                 precioDoc = new Precio(datosActualizacion);
-                await precioDoc.save();
+                const resultado = await precioDoc.save();
+                console.log(`✅ Nuevo precio guardado en MongoDB: ${resultado.precio}`);
                 return res.status(201).json({ success: true, message: 'Precio creado', data: precioDoc });
             }
 
         } catch (error) {
-            console.error('Error crearOActualizarPrecio:', error);
+            console.error('❌ Error crearOActualizarPrecio:', error);
             res.status(500).json({ success: false, message: error.message });
         }
     }
@@ -132,35 +147,145 @@ export class PriceController {
         }
     }
 
+    async obtenerMisPrecios(req, res) {
+        try {
+            const usuario_id = req.user.usuario_id; // Del token
+
+            // 1. Buscamos cuál es el ID real de la tienda de este usuario
+            const tienda = await prisma.tienda.findUnique({
+                where: { usuario_id: usuario_id }
+            });
+
+            if (!tienda) {
+                return res.status(404).json({ success: false, message: 'No tienes una tienda registrada.' });
+            }
+
+            console.log(`🔎 Buscando precios para Tienda: ${tienda.nombre} (ID: ${tienda.tienda_id})`);
+
+            // 2. Usamos el ID correcto (tienda.tienda_id) para buscar en Mongo
+            const precios = await Precio.find({ tienda_id: tienda.tienda_id })
+                                      .sort({ ultima_actualizacion: -1 });
+
+            res.json({ success: true, count: precios.length, data: precios });
+
+        } catch (error) {
+            console.error('Error obtenerMisPrecios:', error);
+            res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
     // ==========================================
     // 2. GESTIÓN DE OFERTAS
     // ==========================================
 
-    // POST /api/prices/ofertas (Específico para crear ofertas)
     async crearOferta(req, res) {
-        req.body.en_oferta = true; // Forzamos el flag para asegurar que entre en la lógica de oferta
-        return this.crearOActualizarPrecio(req, res);
+        try {
+            const { producto_id, porcentaje, vigencia } = req.body;
+            const usuario_id = req.user.usuario_id; 
+
+            // 1. BUSCAR LA TIENDA REAL (CORRECCIÓN)
+            const tienda = await prisma.tienda.findUnique({ where: { usuario_id } });
+            if (!tienda) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+
+            // 2. BUSCAR PRECIO USANDO EL ID DE TIENDA CORRECTO
+            const precioActual = await Precio.findOne({ 
+                producto_id, 
+                tienda_id: tienda.tienda_id // <--- Usamos el ID numérico/real de la tienda
+            });
+
+            if (!precioActual) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Primero debes asignar un precio normal al producto.' 
+                });
+            }
+
+            // 3. Calcular Precios
+            const precioBase = precioActual.en_oferta ? precioActual.precio_original : precioActual.precio;
+            const descuento = (precioBase * porcentaje) / 100;
+            const precioFinal = precioBase - descuento;
+
+            // 4. Actualizar Documento
+            precioActual.precio = precioFinal;
+            precioActual.precio_original = precioBase;
+            precioActual.en_oferta = true;
+            precioActual.tipo_descuento = `${porcentaje}%`;
+            precioActual.vigencia_oferta = vigencia || null;
+
+            await precioActual.save();
+
+            // Notificar (Opcional, si tienes el método)
+            if (this.notificarOfertaCreada) {
+                this.notificarOfertaCreada(precioActual, tienda.nombre).catch(e => console.error(e));
+            }
+
+            res.json({ success: true, message: 'Oferta aplicada', data: precioActual });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ success: false, message: error.message });
+        }
     }
 
-    // DELETE /api/prices/ofertas/producto/:producto_id/tienda/:tienda_id
+// Método auxiliar para enviar la notificación
+    async notificarOfertaCreada(precioDoc, tiendaNombre) {
+        
+        const payload = {
+            evento: 'producto_en_oferta',
+            datos: {
+                producto_id: precioDoc.producto_id,
+                producto_nombre: precioDoc.producto_nombre || 'Producto en Oferta',
+                precio_original: precioDoc.precio_original,
+                precio_oferta: precioDoc.precio,
+                tienda_nombre: tiendaNombre,
+                vigencia: precioDoc.vigencia_oferta
+            }
+        };
+
+        const NOTIFICATION_SERVICE_URL = process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3004/api/notifications';
+
+        // Configuración de seguridad (Token)
+        const config = {
+            headers: {
+                'x-service-token': process.env.SERVICE_SECRET_TOKEN || 'profeco_dev_token_123'
+            }
+        };
+
+        try {
+            // ✅ ESTA ES LA ÚNICA LLAMADA QUE NECESITAS
+            await axios.post(NOTIFICATION_SERVICE_URL, payload, config);
+            console.log(`📡 Evento de oferta enviado para: ${payload.datos.producto_id}`);
+        } catch (error) {
+            console.error('⚠️ Error al notificar oferta:', error.message);
+            // No lanzamos el error para no detener el flujo principal de guardar precio
+        }
+    }
+
+    // DELETE /api/prices/ofertas/producto/:producto_id
+    // Nota: Eliminamos el parámetro :tienda_id de la URL porque lo sacamos del token por seguridad
     async eliminarOferta(req, res) {
         try {
-            const { producto_id, tienda_id } = req.params;
-            
-            // Validar que la tienda sea dueña (si se requiere seguridad estricta aquí)
-            // Por ahora confiamos en el endpoint, pero idealmente validaríamos contra req.user
+            const { producto_id } = req.params;
+            const usuario_id = req.user.usuario_id;
 
-            const precioDoc = await Precio.findOne({ producto_id, tienda_id });
+            // 1. BUSCAR LA TIENDA REAL
+            const tienda = await prisma.tienda.findUnique({ where: { usuario_id } });
+            if (!tienda) return res.status(404).json({ success: false, message: 'Tienda no encontrada.' });
+
+            // 2. BUSCAR PRECIO
+            const precioDoc = await Precio.findOne({ 
+                producto_id, 
+                tienda_id: tienda.tienda_id 
+            });
+
             if (!precioDoc) return res.status(404).json({ success: false, message: 'Precio no encontrado' });
+            if (!precioDoc.en_oferta) return res.status(400).json({ success: false, message: 'No hay oferta activa' });
 
-            if (!precioDoc.en_oferta) return res.status(400).json({ success: false, message: 'Este producto no tiene una oferta activa' });
-
-            // Restaurar precio original si existe
+            // 3. RESTAURAR
             if (precioDoc.precio_original) {
                 precioDoc.precio = precioDoc.precio_original;
             }
             
-            // Limpiar campos de oferta
             precioDoc.en_oferta = false;
             precioDoc.precio_promocional = null;
             precioDoc.precio_original = null;
@@ -369,31 +494,40 @@ export class PriceController {
   // Toggle Wishlist (Agregar/Quitar Producto)
   async toggleWishlist(req, res) {
     try {
-      const { usuario_id } = req.user;
+      // Obtenemos todos los datos del usuario desde el Token
+      const { usuario_id, email } = req.user; 
       const { producto_id } = req.body;
 
       if (!producto_id) return res.status(400).json({ message: 'Producto ID requerido' });
 
-      // Buscamos o creamos el documento de preferencias
       let prefs = await Preferencia.findOne({ usuario_id });
+      
       if (!prefs) {
-        prefs = new Preferencia({ usuario_id, wishlist: [], tiendas_favoritas: [] });
+        // AL CREAR: Guardamos el email
+        prefs = new Preferencia({ 
+            usuario_id, 
+            email, // <--- AQUÍ SE GUARDA
+            wishlist: [], 
+            tiendas_favoritas: [] 
+        });
+      } else if (!prefs.email) {
+        // Si ya existía pero no tenía email (migración), lo actualizamos
+        prefs.email = email;
       }
 
-      // Verificamos si ya está en la lista
       const index = prefs.wishlist.indexOf(producto_id);
       let accion = '';
 
       if (index === -1) {
-        prefs.wishlist.push(producto_id); // Agregar
+        prefs.wishlist.push(producto_id);
         accion = 'agregado';
       } else {
-        prefs.wishlist.splice(index, 1); // Quitar
+        prefs.wishlist.splice(index, 1);
         accion = 'eliminado';
       }
 
       await prefs.save();
-      res.json({ success: true, message: `Producto ${accion} de la lista`, wishlist: prefs.wishlist });
+      res.json({ success: true, message: `Producto ${accion}`, wishlist: prefs.wishlist });
 
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
