@@ -1,7 +1,42 @@
 {
+  "name": "proyecto-profeco-distribuidos",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "db:migrate": "cd ../prisma && npx prisma migrate dev --schema=./schema.prisma",
+    "db:generate": "cd ../prisma && npx prisma generate --schema=./schema.prisma",
+    "db:studio": "cd ../prisma && npx prisma studio --schema=./schema.prisma"
+  },
   "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "axios": "^1.13.2",
+    "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0"
-  }
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "handlebars": "^4.7.8",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.11"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "prisma": "^5.10.2"
+  },
+  "description": "Proyecto final ProFeCo para la clase de Sistemas Distribuidos desarrollado por Angel Santos y Christopher Elizalde",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angeldeyisus/Proyecto-ProFeCo-Distribuidos.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/angeldeyisus/Proyecto-ProFeCo-Distribuidos/issues"
+  },
+  "homepage": "https://github.com/angeldeyisus/Proyecto-ProFeCo-Distribuidos#readme"
 }
